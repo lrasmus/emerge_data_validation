@@ -65,6 +65,15 @@ describe EMERGE::Phenotype::DataFileValidator do
       variables)
   end
 
+  it "flags in error encoded fields that have an unknown value" do
+    variables = VARIABLES.clone
+    variables["DIAGNOSIS"][:normalized_type] = :encoded
+    variables["DIAGNOSIS"][:values] = { "TEST1" => "VAL1", "TEST2" => "VAL2" }
+    process_with_expected_error("SUBJID,Diagnosis\r\n1,TEST3",
+      "The value 'TEST3' for the variable 'Diagnosis' (1st row) is not listed in the data dictionary.",
+      variables)
+  end
+
   def process_with_expected_warning data, expected_warning, variables
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
     puts validation[:errors] unless validation[:errors].length == 0

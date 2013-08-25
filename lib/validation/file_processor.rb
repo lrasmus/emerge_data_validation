@@ -7,7 +7,9 @@ module EMERGE
     # Author::    Luke Rasmussen (mailto:luke.rasmussen@northwestern.edu)
     class FileProcessor
       def initialize(file_content, data_type, delimiter = :csv)
-        @file_content = file_content
+        # Force the file text to end up as UTF-8.  There are issues with some real files unless we explicitly do this
+        # The first encode to UTF-16 helps to ensure the encoding is switched & replace is done
+        @file_content = file_content.encode('UTF-16', :invalid => :replace, :undef => :replace, :replace => "").encode('UTF-8')
         @data_type = data_type
         @delimiter = delimiter
         process

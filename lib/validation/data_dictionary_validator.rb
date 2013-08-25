@@ -155,7 +155,7 @@ module EMERGE
               @results[:errors].push("It appears that the value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is a duplicate value for this variable.")
             end
 
-            missing_na_value_found = !(/.*missing.*|not applicable|NA/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
+            missing_na_value_found = !(/.*missing.*|not applicable|NA|not assessed/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
           end
 
           @variables[variable_key][:values] = unique_values unless @variables[variable_key].nil?

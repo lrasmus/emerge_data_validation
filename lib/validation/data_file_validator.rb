@@ -19,6 +19,7 @@ module EMERGE
         check_variable_order
         check_missing_data
         check_numeric_ranges
+        check_encoded_values
         @results
       end
 
@@ -69,6 +70,20 @@ module EMERGE
             if (value < variable[:min_value] or value > variable[:max_value])
               @results[:errors].push("The value for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
             end
+          end
+        end
+      end
+
+      def check_encoded_values
+        @file.data.each_with_index do |row, row_index|
+          row.each_with_index do |field, field_index|
+            next if field[0].nil?
+            variable_name = field[0].upcase
+            variable = @variables[variable_name]
+            next if variable.nil?
+            next unless variable[:normalized_type] == :encoded
+            formatted_value = field[1].upcase
+            @results[:errors].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is not listed in the data dictionary.") unless variable[:values].has_key?(formatted_value)
           end
         end
       end
