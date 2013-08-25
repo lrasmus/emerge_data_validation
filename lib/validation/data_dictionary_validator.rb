@@ -1,3 +1,4 @@
+require 'validation/base_validator'
 require 'validation/file_processor'
 
 module EMERGE
@@ -5,7 +6,7 @@ module EMERGE
     # Performs validation of a data dictionary file, according to the pre-defined rules
     #
     # Author::    Luke Rasmussen (mailto:luke.rasmussen@northwestern.edu)
-    class DataDictionaryValidator
+    class DataDictionaryValidator < BaseValidator
       EXPECTED_COLUMNS = ["VARNAME", "VARDESC", "SOURCE", "SOURCE ID", "DOCFILE", "TYPE", "UNITS", "MIN", "MAX", "RESOLUTION", "REPEATED MEASURE", "REQUIRED", "COMMENT1", "COMMENT2", "VALUES"]
       REQUIRED_DATA_COLUMNS = ["VARNAME", "VARDESC", "TYPE", "REPEATED MEASURE", "REQUIRED"]
       COLUMN_VALIDATION_REGEX = [
@@ -27,8 +28,7 @@ module EMERGE
       ]
 
       def initialize(data_dictionary_data, delimiter = :csv)
-        @file = FileProcessor.new(data_dictionary_data, :data_dictionary, delimiter)
-        @results = {:errors => [], :warnings => []}
+        super(data_dictionary_data, :data_dictionary, delimiter)
         @variables = Hash.new
         @values_column_valid = false
         #@values = Hash.new
@@ -45,17 +45,12 @@ module EMERGE
         check_unique_variables
         check_values_column_position
         check_values
+        set_variable_constraints
         @results
       end
 
       def variables
         @variables
-      end
-
-      def rows_exist?
-        result = !(@file.nil? or @file.headers.blank? or @file.data.blank?)
-        @results[:errors].push("No rows containing data could be found") unless result
-        result
       end
 
       def variable_name_column_exists?
@@ -103,7 +98,7 @@ module EMERGE
           if @variables.has_key?(row[0].upcase)
             @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) appears to be a duplicate of the variable '#{@variables[row[0].upcase][:original_name]}' (#{@variables[row[0].upcase][:row].ordinalize} row).")
           else
-            @variables[row[0].upcase] = {:values => nil, :row => (index + 1), :original_name => row[0]}
+            @variables[row[0].upcase] = {:values => nil, :row => (index + 1), :original_name => row[0], :normalized_type => nil}
           end
         end
       end
@@ -170,6 +165,29 @@ module EMERGE
             @results[:errors].push("The optional variable '#{variable}' (#{(index + 1).ordinalize} row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.")
           end
         end
+      end
+
+      def set_variable_constraints
+        type_index = @file.headers.index("TYPE")
+        return if type_index.nil?
+        min_index = @file.headers.index("MIN")
+        max_index = @file.headers.index("MAX")
+        @file.data.each_with_index do |row, index|
+          variable_key = row[0].upcase
+          normalized_type = get_normalized_type(row[type_index])
+          @variables[variable_key][:normalized_type] = normalized_type
+          @variables[variable_key][:min_value] = convert_string_to_number(row[min_index], normalized_type) unless min_index.nil?
+          @variables[variable_key][:max_value] = convert_string_to_number(row[max_index], normalized_type) unless max_index.nil?
+        end
+      end
+
+      private
+
+      def get_normalized_type type
+        return :encoded if (type =~ /.*Encoded.*/i)
+        return :integer if (type =~ /^Integer$/i)
+        return :decimal if (type =~ /^Decimal$/i)
+        return :string if (type =~ /^String$/i)
       end
     end
   end

@@ -26,7 +26,7 @@ module EMERGE
       def process
         lines = clean_lines
         @data = CSV.parse(lines.join("\r"), {:headers => true, :skip_blanks => true})
-        @data.delete(nil) # Nil columns should be purged
+        #@data.delete(nil) # Nil columns should be purged
       end
 
       # Perform cleaning and normalization on the input lines
