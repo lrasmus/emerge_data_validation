@@ -27,7 +27,7 @@ module EMERGE
           if header.nil? or header.strip.blank?
             @results[:errors].push("The #{(index + 1).ordinalize} column has a blank header - please set the header and define it in the data dictionary.")
           elsif !@variables.has_key?(header.upcase)
-            @results[:errors].push("The variable '#{header}' (column (#{(index + 1).ordinalize} column) is not defined in the data dictionary.")
+            @results[:errors].push("The variable '#{header}' (#{(index + 1).ordinalize} column) is not defined in the data dictionary.")
           end
         end
 

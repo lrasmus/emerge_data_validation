@@ -31,6 +31,12 @@ describe EMERGE::Phenotype::DataFileValidator do
       VARIABLES)
   end
 
+  it "flags in error columns that are not in the data dictionary" do
+    process_with_expected_error("SUBJID,Diagnosis,Test\r\n1,109.8,1\r\n2,003.3,1",
+      "The variable 'Test' (3rd column) is not defined in the data dictionary.",
+      VARIABLES)
+  end
+
   it "flags in error empty/blank fields in data rows" do
     process_with_expected_error("SUBJID,Diagnosis\r\n1,  \r\n2,003.3",
       "A value for 'Diagnosis' (1st row) is blank, however it is best practice to provide a value to explicitly define missing data.",
