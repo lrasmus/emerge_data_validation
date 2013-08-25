@@ -32,6 +32,15 @@ describe EMERGE::Phenotype::DataDictionaryValidator do
     results[:warnings].length.should == 0
   end
 
+  it "stores the values for each variable" do
+    validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES,
+Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,TMP=Test;TMP2=15,", :csv)
+    results = validation.validate
+    puts results[:errors]
+    results[:errors].length.should eql 0
+    validation.variables["VALID_VARIABLE"][:values].length.should eql 2
+  end
+
   describe "flags in error rows that don't validate" do
     it "VARNAME" do
       process_with_expected_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES,
@@ -68,8 +77,8 @@ valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,Decimal,Units,3,,RESOLUTION,No,N
 
   it "flags in error duplicate variables" do
     process_with_expected_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES,
-valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No,COMMENT1,COMMENT2,VALUES,
-Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No,COMMENT1,COMMENT2,VALUES,",
+valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=1,
+Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=2,",
       "'Valid_Variable' (2nd row) appears to be a duplicate of the variable 'valid_variable' (1st row).")
   end
 
@@ -92,6 +101,12 @@ Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No
     process_with_expected_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES,
 Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No,COMMENT1,COMMENT2,TMP=Test;tmp=Test2,",
       "It appears that the value 'tmp=Test2' for variable 'Valid_Variable' (1st row) is a duplicate value for this variable.")
+  end
+
+  it "flags in error optional variables without a Missing/NA value" do
+    process_with_expected_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES,
+Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No,COMMENT1,COMMENT2,TMP=Test,",
+      "The optional variable 'Valid_Variable' (1st row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.")
   end
 end
 

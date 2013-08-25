@@ -29,8 +29,9 @@ module EMERGE
       def initialize(data_dictionary_data, delimiter = :csv)
         @file = FileProcessor.new(data_dictionary_data, :data_dictionary, delimiter)
         @results = {:errors => [], :warnings => []}
-        @variables = Array.new
+        @variables = Hash.new
         @values_column_valid = false
+        #@values = Hash.new
       end
 
       def validate
@@ -45,6 +46,10 @@ module EMERGE
         check_values_column_position
         check_values
         @results
+      end
+
+      def variables
+        @variables
       end
 
       def rows_exist?
@@ -95,11 +100,10 @@ module EMERGE
 
       def check_unique_variables
         @file.data.each_with_index do |row, index|
-          existing_index = @variables.find_index{ |x| x.casecmp(row[0]) == 0 }
-          unless existing_index.nil?
-            @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) appears to be a duplicate of the variable '#{@variables[existing_index]}' (#{(existing_index + 1).ordinalize} row).")
+          if @variables.has_key?(row[0].upcase)
+            @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) appears to be a duplicate of the variable '#{@variables[row[0].upcase][:original_name]}' (#{@variables[row[0].upcase][:row].ordinalize} row).")
           else
-            @variables.push row[0]
+            @variables[row[0].upcase] = {:values => nil, :row => (index + 1), :original_name => row[0]}
           end
         end
       end
@@ -135,22 +139,35 @@ module EMERGE
 
       def check_values
         return unless @values_column_valid
-        # Based on if the values column is valid, we can assume that the VALUES columns are all at the end
         found_index = @file.headers.index("VALUES")
+        required_column_index = @file.headers.index("REQUIRED")
         @file.data.each_with_index do |row, index|
-          unique_values = Hash.new
           next if row.fields[-1].blank?
-          variables = row.fields[-1].split(';')
-          variables.each_with_index do |variable, var_index|
-            variable ||= ""
-            variable_parts = variable.split('=')
-            @results[:errors].push("Value '#{variable}' for variable '#{row[0]}' (#{(index + 1).ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless variable_parts.length == 2
-            found_item = unique_values[variable_parts[0].upcase]
+          unique_values = Hash.new
+          variable = row[0]
+          variable_key = variable.upcase
+          values = row.fields[-1].split(';')
+          is_required = !(/Yes/i.match(row[required_column_index]).nil?)
+          missing_na_value_found = false
+          values.each_with_index do |value, var_index|
+            value ||= ""
+            value_parts = value.split('=')
+            @results[:errors].push("Value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
+            found_item = unique_values[value_parts[0].upcase]
             if (found_item.nil?)
-              unique_values[variable_parts[0].upcase] = variable_parts
+              unique_values[value_parts[0].upcase] = value_parts[1]
             else
-              @results[:errors].push("It appears that the value '#{variable}' for variable '#{row[0]}' (#{(index + 1).ordinalize} row) is a duplicate value for this variable.")
+              @results[:errors].push("It appears that the value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is a duplicate value for this variable.")
             end
+
+            missing_na_value_found = !(/.*missing.*|not applicable|NA/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
+          end
+
+          @variables[variable_key][:values] = unique_values unless @variables[variable_key].nil?
+
+          # Variables that are not required must define a missing or not applicable value
+          if !is_required and !missing_na_value_found
+            @results[:errors].push("The optional variable '#{variable}' (#{(index + 1).ordinalize} row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.")
           end
         end
       end
