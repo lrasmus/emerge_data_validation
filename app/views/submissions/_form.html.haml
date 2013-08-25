@@ -1,0 +1,22 @@
+= form_for @submission, :html => {:multipart=>true} do |f|
+  - if @submission.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@submission.errors.count, "error")} prohibited this submission from being saved:"
+      %ul
+        - @submission.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :data_dictionary
+    = f.file_field :data_dictionary
+  .field
+    = f.label :data_file
+    = f.file_field :data_file
+  .field
+    = f.label :content_type
+    = f.text_field :content_type
+  .field
+    = f.label :organization
+    = f.text_field :organization
+  .actions
+    = f.submit 'Save'

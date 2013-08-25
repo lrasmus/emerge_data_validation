@@ -1,0 +1,18 @@
+%p#notice= notice
+
+%p
+  %b Data dictionary:
+  = @submission.data_dictionary
+%p
+  %b Data file:
+  = @submission.data_file
+%p
+  %b Content type:
+  = @submission.content_type
+%p
+  %b Organization:
+  = @submission.organization
+
+= link_to 'Edit', edit_submission_path(@submission)
+\|
+= link_to 'Back', submissions_path

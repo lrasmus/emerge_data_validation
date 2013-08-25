@@ -1,0 +1,25 @@
+%h1 Listing submissions
+
+%table
+  %tr
+    %th Data dictionary
+    %th Data file
+    %th Content type
+    %th Organization
+    %th
+    %th
+    %th
+
+  - @submissions.each do |submission|
+    %tr
+      %td= submission.data_dictionary
+      %td= submission.data_file
+      %td= submission.content_type
+      %td= submission.organization
+      %td= link_to 'Show', submission
+      %td= link_to 'Edit', edit_submission_path(submission)
+      %td= link_to 'Destroy', submission, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Submission', new_submission_path

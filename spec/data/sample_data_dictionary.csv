@@ -1,0 +1,7 @@
+VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES,
+SUBJID,Deidentified Subject/eMERGE ID,caDSR,2181644,,String,,,,,No,Yes,Non-enumerated value domain. Deidentified ID where the first two digits denote the origination site of the samples; site key:  Marshfield Clinic=16; Vanderbilt University=27; Group Health Cooperative=38; Mayo Clinic=49; Northwestern University=52,,,
+Weight,Subject's weight at enrollment,caDSR,2179689,,"Decimal, encoded value",Kilograms,30,200,,Yes,Yes,Non-pregnant weights (do not include weights during pregnancy or 9 months after pregnancy),,.=Missing value,
+Height,Subject's height at enrollment,caDSR,2179643,,"Decimal, encoded value",Inches,140,200,,Yes,Yes,"One observation age corresponds  to one height.  If more than one height value is available for the same observation age, use the median value.",,.=Missing value,
+Body_Mass_Index,Subject's BMI over time,caDSR,2006410,,"Decimal, encoded value",BMI,0,50,2,Yes,Yes,1.Non-pregnant BMI (do not include BMIs during pregnancy or 9 months after pregnancy); 2.Imputed BMI based - 6 month time period,,.=Missing value,NA=Not Accessed
+Age_Observation,Age when clinical event recorded in record,caDSR,2003852,,"Integer, encoded value",Years,18,89,,No,Yes,,,.=Missing value,
+Visit_Number,"A database generated unique key created for weight, height, BMI repeated values",,,,String,,,,,No,No,,,,
