@@ -83,7 +83,12 @@ module EMERGE
             next if variable.nil?
             next unless variable[:normalized_type] == :encoded
             formatted_value = field[1].upcase
-            @results[:errors].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is not listed in the data dictionary.") unless variable[:values].has_key?(formatted_value)
+            if !variable[:values].has_key?(formatted_value)
+              @results[:errors].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is not listed in the data dictionary.")
+            elsif !variable[:original_values].has_key?(field[1])
+              correct_val = variable[:original_values].find{|val| val[0].casecmp(field[1]) == 0}
+              @results[:warnings].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is found, but does not match exactly because of capitalization (should be '#{correct_val[0]}').")
+            end
           end
         end
       end

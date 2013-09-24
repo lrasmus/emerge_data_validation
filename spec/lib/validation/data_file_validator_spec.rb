@@ -74,6 +74,17 @@ describe EMERGE::Phenotype::DataFileValidator do
       variables)
   end
 
+  it "flags with a warning encoded fields that have a known value but mismatched case" do
+    variables = VARIABLES.clone
+    variables["DIAGNOSIS"][:normalized_type] = :encoded
+    values = { "TEST1" => "VAL1", "TEST2" => "VAL2" }
+    variables["DIAGNOSIS"][:values] = values
+    variables["DIAGNOSIS"][:original_values] = values
+    process_with_expected_warning("SUBJID,Diagnosis\r\n1,test1",
+      "The value 'test1' for the variable 'Diagnosis' (1st row) is found, but does not match exactly because of capitalization (should be 'TEST1').",
+      variables)
+  end
+
   def process_with_expected_warning data, expected_warning, variables
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
     puts validation[:errors] unless validation[:errors].length == 0
