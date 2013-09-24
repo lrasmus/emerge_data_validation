@@ -14,7 +14,7 @@ namespace :validate do
     dd_content, dd_validator = prepare_dictionary_validator ENV["dictionary_file_path"]
     dd_results = dd_validator.validate
     if (dd_results[:errors].length > 0)
-      puts "Please correct the following issues with your data dictionary, and then run thie validator again"
+      puts "Please correct the following issues with your data dictionary, and then run the validator again"
       puts dd_results
     else
       df_content, df_validator = prepare_file_validator ENV["data_file_path"], dd_validator.variables
