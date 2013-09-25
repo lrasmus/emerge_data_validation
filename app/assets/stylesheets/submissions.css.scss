@@ -1,3 +1,47 @@
 // Place all the styles related to the Submissions controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+h1, h2 {
+  margin-bottom: 2px;
+  line-height: 1;
+}
+
+h1 {
+  font-size: 1.5em;
+}
+
+h2 {
+  font-size: 1.15em;
+}
+
+.status {
+  padding: 5px 10px;
+  display: inline-block;
+  width: auto;
+  margin-left: 10px;
+}
+
+.passed {
+  background-color: rgb(223, 242, 191);
+  background-color: rgba(223, 242, 191, 0.25);
+}
+
+.warning {
+  background-color: rgb(254, 239, 179);
+  background-color: rgba(254, 239, 179, 0.25);
+}
+
+.error {
+  background-color: rgb(255, 186, 186);
+  background-color: rgba(255, 186, 186, 0.25);
+}
+
+.results {
+  padding-bottom: 20px;
+
+  ul {
+    padding-left: 10px;
+    margin: 0px;
+  }
+}
