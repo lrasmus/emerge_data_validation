@@ -15,6 +15,7 @@ module EMERGE
       def validate
         # Start by performing checks that would prevent us from doing any additional processing.
         return @results unless rows_exist?
+        identify_blank_rows
         check_variables_used
         check_variable_order
         check_missing_data
@@ -76,6 +77,7 @@ module EMERGE
 
       def check_encoded_values
         @file.data.each_with_index do |row, row_index|
+          next if is_blank_row?(row)
           row.each_with_index do |field, field_index|
             next if field[0].nil?
             variable_name = field[0].upcase

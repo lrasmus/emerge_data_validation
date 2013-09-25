@@ -38,8 +38,13 @@ module EMERGE
         # Start by performing checks that would prevent us from doing any additional processing.
         return @results unless rows_exist?
         return @results unless variable_name_column_exists?
+
+        # Validate the columns
         check_required_columns
         check_header_columns
+
+        # Validate rows & values in the rows
+        identify_blank_rows
         validate_rows
         check_constraints_for_types
         check_unique_variables
@@ -88,6 +93,7 @@ module EMERGE
           next if found_index.nil? or COLUMN_VALIDATION_REGEX[col_index].nil?
           validation = COLUMN_VALIDATION_REGEX[col_index]
           @file.data.each_with_index do |row, index|
+            next if is_blank_row?(row)
             @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row), column '#{header}' (value = '#{row[found_index]}') is invalid: #{validation[1]}") unless validation[0].match(row[found_index])
           end
         end
@@ -95,6 +101,7 @@ module EMERGE
 
       def check_unique_variables
         @file.data.each_with_index do |row, index|
+          next if is_blank_row?(row)
           if @variables.has_key?(row[0].upcase)
             @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) appears to be a duplicate of the variable '#{@variables[row[0].upcase][:original_name]}' (#{@variables[row[0].upcase][:row].ordinalize} row).")
           else
@@ -178,6 +185,7 @@ module EMERGE
         min_index = @file.headers.index("MIN")
         max_index = @file.headers.index("MAX")
         @file.data.each_with_index do |row, index|
+          next if is_blank_row?(row)
           variable_key = row[0].upcase
           normalized_type = get_normalized_type(row[type_index])
           @variables[variable_key][:normalized_type] = normalized_type

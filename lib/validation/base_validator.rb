@@ -22,6 +22,20 @@ module EMERGE
         return value.to_f if normalized_type == :decimal
         value
       end
+
+      def is_blank_row? row
+        row.each_with_index do |cell, index|
+          return false unless cell[1].nil? or cell[1].strip == ""
+        end
+        true
+      end
+
+      def identify_blank_rows
+        @file.data.each_with_index do |row, row_index|
+          puts row.inspect if is_blank_row?(row)
+          @results[:warnings].push("Row #{row_index+1} appears to be blank and should be removed.") if is_blank_row?(row)
+        end
+      end
     end
   end
 end
