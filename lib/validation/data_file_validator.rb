@@ -49,6 +49,7 @@ module EMERGE
 
       def check_missing_data
         @file.data.each_with_index do |row, row_index|
+          next if is_blank_row?(row)
           row.each_with_index do |field, field_index|
             @results[:errors].push("A value for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is blank, however it is best practice to provide a value to explicitly define missing data.") if field[1].nil? or field[1].strip.blank?
           end
@@ -57,6 +58,7 @@ module EMERGE
 
       def check_numeric_ranges
         @file.data.each_with_index do |row, row_index|
+          next if is_blank_row?(row)
           row.each_with_index do |field, field_index|
             next if field[0].nil?
             variable_name = field[0].upcase
