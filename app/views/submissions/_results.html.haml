@@ -1,0 +1,11 @@
+- unless results.blank?
+  %div.results{:id => title.downcase.tr(' ', '_')}
+    %h1= title
+    %div
+      = "File: #{results[:file_name]}"
+    - if results[:warnings].blank? and results[:errors].blank?
+      .status.passed
+        %ul
+          %li No warnings or errors were detected
+    = render "warnings", {:warnings => results[:warnings]}
+    = render "errors", {:errors => results[:errors]}
