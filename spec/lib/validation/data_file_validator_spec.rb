@@ -49,7 +49,7 @@ describe EMERGE::Phenotype::DataFileValidator do
     variables["DIAGNOSIS"][:min_value] = 6
     variables["DIAGNOSIS"][:max_value] = 100
     process_with_expected_error("SUBJID,Diagnosis\r\n1,5",
-      "The value for 'Diagnosis' (1st row) is outside of the range defined in the data dictionary (6 to 100).",
+      "The value '5' for 'Diagnosis' (1st row) is outside of the range defined in the data dictionary (6 to 100).",
       variables)
 
     process_with_expected_success("SUBJID,Diagnosis\r\n1,10", variables)
@@ -61,7 +61,17 @@ describe EMERGE::Phenotype::DataFileValidator do
     variables["DIAGNOSIS"][:min_value] = 6
     variables["DIAGNOSIS"][:max_value] = 100
     process_with_expected_error("SUBJID,Diagnosis\r\n1,7.0",
-      "The value for 'Diagnosis' in the 1st row (7.0) should be an integer, not a decimal.",
+      "The value '7.0' for 'Diagnosis' (1st row) should be an integer, not a decimal.",
+      variables)
+  end
+
+  it "flags in error integer fields that contain alphabetic characters" do
+    variables = VARIABLES.clone
+    variables["DIAGNOSIS"][:normalized_type] = :integer
+    variables["DIAGNOSIS"][:min_value] = 6
+    variables["DIAGNOSIS"][:max_value] = 100
+    process_with_expected_error("SUBJID,Diagnosis\r\n1,7a",
+      "The value '7a' for 'Diagnosis' (1st row) should be an integer, but appears to have non-numeric characters.",
       variables)
   end
 
@@ -69,8 +79,9 @@ describe EMERGE::Phenotype::DataFileValidator do
     variables = VARIABLES.clone
     variables["DIAGNOSIS"][:normalized_type] = :encoded
     variables["DIAGNOSIS"][:values] = { "TEST1" => "VAL1", "TEST2" => "VAL2" }
+    variables["DIAGNOSIS"][:original_values] = { "Test1" => "VAL1", "Test2" => "VAL2" }
     process_with_expected_error("SUBJID,Diagnosis\r\n1,TEST3",
-      "The value 'TEST3' for the variable 'Diagnosis' (1st row) is not listed in the data dictionary.",
+      "The value 'TEST3' for the variable 'Diagnosis' (1st row) is not listed in the data dictionary.  It should be one of the following: Test1, Test2",
       variables)
   end
 

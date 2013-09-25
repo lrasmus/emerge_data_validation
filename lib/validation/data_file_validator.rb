@@ -67,11 +67,15 @@ module EMERGE
             next unless variable[:normalized_type] == :integer or variable[:normalized_type] == :decimal
             value = convert_string_to_number(field[1], variable[:normalized_type])
             if (variable[:normalized_type] == :integer)
-              @results[:errors].push("The value for '#{@file.headers[field_index]}' in the #{(row_index+1).ordinalize} row (#{field[1]}) should be an integer, not a decimal.") if field[1] =~ /\./
+              if field[1] =~ /\./
+                @results[:errors].push("The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) should be an integer, not a decimal.")
+              elsif (/[\D]+/ === field[1])
+                @results[:errors].push("The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) should be an integer, but appears to have non-numeric characters.")
+              end
             end
 
             if (value < variable[:min_value] or value > variable[:max_value])
-              @results[:errors].push("The value for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
+              @results[:errors].push("The value '#{value}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
             end
           end
         end
@@ -88,13 +92,20 @@ module EMERGE
             next unless variable[:normalized_type] == :encoded
             formatted_value = field[1].upcase
             if !variable[:values].has_key?(formatted_value)
-              @results[:errors].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is not listed in the data dictionary.")
+              @results[:errors].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is not listed in the data dictionary.  #{format_list_of_values_for_error(variable[:original_values])}")
             elsif !variable[:original_values].has_key?(field[1])
               correct_val = variable[:original_values].find{|val| val[0].casecmp(field[1]) == 0}
               @results[:warnings].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is found, but does not match exactly because of capitalization (should be '#{correct_val[0]}').")
             end
           end
         end
+      end
+
+      def format_list_of_values_for_error values
+        if values.length < 6
+          return "It should be one of the following: #{values.keys.join(', ')}"
+        end
+        ""
       end
     end
   end
