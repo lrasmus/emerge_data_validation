@@ -1,6 +1,12 @@
 EmergeDataValidation::Application.routes.draw do
   resources :submissions
 
+  namespace :api do
+    namespace :v1 do
+      resources :submissions, :only => [:index, :create]
+    end
+  end
+
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

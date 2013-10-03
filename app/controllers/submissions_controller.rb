@@ -3,6 +3,8 @@ require 'validation/data_dictionary_validator'
 require 'validation/data_file_validator'
 
 class SubmissionsController < ApplicationController
+  include SubmissionsHelper
+
   # GET /submissions
   # GET /submissions.json
   def index
@@ -45,19 +47,20 @@ class SubmissionsController < ApplicationController
   # POST /submissions.json
   def create
     @submission = Submission.new(params[:submission])
-    data_dictionary = params[:submission][:data_dictionary].read
-    data_file = params[:submission][:data_file].read unless params[:submission][:data_file].blank?
+    get_data_from_params(params[:submission][:data_dictionary], params[:submission][:data_file])
+    #data_dictionary = params[:submission][:data_dictionary].read
+    #data_file = params[:submission][:data_file].read unless params[:submission][:data_file].blank?
 
-    unless data_dictionary.blank?
-      dd_processor = EMERGE::Phenotype::DataDictionaryValidator.new data_dictionary, :csv
-      @data_dictionary_results = dd_processor.validate
-      @data_dictionary_results[:file_name] = params[:submission][:data_dictionary].original_filename
-      unless data_file.blank?
-        df_processor = EMERGE::Phenotype::DataFileValidator.new data_file, dd_processor.variables, :csv
-        @data_file_results = df_processor.validate
-        @data_file_results[:file_name] = params[:submission][:data_file].original_filename
-      end
-    end
+    #unless data_dictionary.blank?
+    #  dd_processor = EMERGE::Phenotype::DataDictionaryValidator.new data_dictionary, :csv
+    #  @data_dictionary_results = dd_processor.validate
+    #  @data_dictionary_results[:file_name] = params[:submission][:data_dictionary].original_filename
+    #  unless data_file.blank?
+    #    df_processor = EMERGE::Phenotype::DataFileValidator.new data_file, dd_processor.variables, :csv
+    #    @data_file_results = df_processor.validate
+    #    @data_file_results[:file_name] = params[:submission][:data_file].original_filename
+    #  end
+    #end
 
     render "report"
 
