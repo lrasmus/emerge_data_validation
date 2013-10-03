@@ -141,30 +141,32 @@ module EMERGE
 
       def check_values
         return unless @values_column_valid
-        found_index = @file.headers.index("VALUES")
+        values_column_index = @file.headers.index("VALUES")
         required_column_index = @file.headers.index("REQUIRED")
         @file.data.each_with_index do |row, index|
-          next if row.fields[-1].blank?
+          next if is_blank_row?(row)
           unique_values = Hash.new
           original_values = Hash.new
           variable = row[0]
           variable_key = variable.upcase
-          values = row.fields[-1].split(';')
+          values = row.fields[values_column_index].split(';') unless row.fields[values_column_index].nil?
           is_required = !(/Yes/i.match(row[required_column_index]).nil?)
           missing_na_value_found = false
-          values.each_with_index do |value, var_index|
-            value ||= ""
-            value_parts = value.split('=')
-            @results[:errors].push("Value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
-            found_item = unique_values[value_parts[0].upcase]
-            if (found_item.nil?)
-              unique_values[value_parts[0].upcase] = value_parts[1]
-              original_values[value_parts[0]] = value_parts[1]
-            else
-              @results[:errors].push("It appears that the value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is a duplicate value for this variable.")
-            end
+          unless values.blank?
+            values.each_with_index do |value, var_index|
+              value ||= ""
+              value_parts = value.split('=')
+              @results[:errors].push("Value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
+              found_item = unique_values[value_parts[0].upcase]
+              if (found_item.nil?)
+                unique_values[value_parts[0].upcase] = value_parts[1]
+                original_values[value_parts[0]] = value_parts[1]
+              else
+                @results[:errors].push("It appears that the value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is a duplicate value for this variable.")
+              end
 
-            missing_na_value_found = !(/.*missing.*|not applicable|NA|not assessed/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
+              missing_na_value_found = !(/.*missing.*|not applicable|NA|not assessed/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
+            end
           end
 
           unless @variables[variable_key].nil?
@@ -189,8 +191,8 @@ module EMERGE
           variable_key = row[0].upcase
           normalized_type = get_normalized_type(row[type_index])
           @variables[variable_key][:normalized_type] = normalized_type
-          @variables[variable_key][:min_value] = convert_string_to_number(row[min_index], normalized_type) unless min_index.nil?
-          @variables[variable_key][:max_value] = convert_string_to_number(row[max_index], normalized_type) unless max_index.nil?
+          @variables[variable_key][:min_value] = min_index.nil? ? nil : convert_string_to_number(row[min_index], normalized_type)
+          @variables[variable_key][:max_value] = max_index.nil? ? nil : convert_string_to_number(row[max_index], normalized_type)
         end
       end
 

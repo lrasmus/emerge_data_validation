@@ -4,4 +4,4 @@ Weight,Subject's weight at enrollment,caDSR,2179689,,"Decimal, encoded value",Ki
 Height,Subject's height at enrollment,caDSR,2179643,,"Decimal, encoded value",Inches,140,200,,Yes,Yes,"One observation age corresponds  to one height.  If more than one height value is available for the same observation age, use the median value.",,.=Missing value
 Body_Mass_Index,Subject's BMI over time,caDSR,2006410,,"Decimal, encoded value",BMI,0,50,2,Yes,Yes,1.Non-pregnant BMI (do not include BMIs during pregnancy or 9 months after pregnancy); 2.Imputed BMI based - 6 month time period,,.=Missing value,NA=Not Accessed
 Age_Observation,Age when clinical event recorded in record,caDSR,2003852,,"Integer, encoded value",Years,18,89,,No,Yes,,,.=Missing value
-Visit_Number,"A database generated unique key created for weight, height, BMI repeated values",,,,String,,,,,No,No,,,
+Visit_Number,"A database generated unique key created for weight, height, BMI repeated values",,,,String,,,,,No,No,,,.=Missing value

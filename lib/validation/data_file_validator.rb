@@ -35,7 +35,7 @@ module EMERGE
 
         formatted_headers = @file.headers.map{|x| x.blank? ? "" : x.upcase}
         @variables.keys.each do |variable|
-          @results[:errors].push("The variable '#{variable}' is defined in the data dictionary, but does not appear in the data file.") unless formatted_headers.include?(variable)
+          @results[:errors].push("The variable '#{@variables[variable][:original_name]}' is defined in the data dictionary, but does not appear in the data file.") unless formatted_headers.include?(variable)
         end
       end
 
@@ -67,6 +67,7 @@ module EMERGE
             next unless variable[:normalized_type] == :integer or variable[:normalized_type] == :decimal
             value = convert_string_to_number(field[1], variable[:normalized_type])
             if (variable[:normalized_type] == :integer)
+              next if !variable[:values].blank? and variable[:values].has_key?(field[1])
               if field[1] =~ /\./
                 @results[:errors].push("The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) should be an integer, not a decimal.")
               elsif (/[\D]+/ === field[1])
@@ -74,8 +75,11 @@ module EMERGE
               end
             end
 
-            if (value < variable[:min_value] or value > variable[:max_value])
-              @results[:errors].push("The value '#{value}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
+            # We only perform the check if both min and max are specified.  They are required in conjunction.
+            unless (variable[:min_value].nil? or variable[:max_value].nil? or value.nil?)
+              if (value < variable[:min_value] or value > variable[:max_value])
+                @results[:errors].push("The value '#{value}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
+              end
             end
           end
         end

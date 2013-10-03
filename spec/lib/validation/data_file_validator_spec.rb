@@ -17,12 +17,19 @@ describe EMERGE::Phenotype::DataFileValidator do
 2,003.3", "The 2nd column has a blank header - please set the header and define it in the data dictionary.", VARIABLES)
   end
 
+  it "flags in warning a file with a blank line (delimiters only)" do
+    process_with_expected_warning("SUBJID,Diagnosis
+1,109.8
+,
+2,003.3", "Row 2 appears to be blank and should be removed.", VARIABLES)
+  end
+
   it "flags in error a file where not all columns are used" do
     variables = VARIABLES.clone
     variables["NEW_COL"] = {:values => nil, :row => 3, :original_name => "New_Col", :normailzed_type => :string}
     process_with_expected_error("SUBJID,Diagnosis
 1,109.8
-2,003.3", "The variable 'NEW_COL' is defined in the data dictionary, but does not appear in the data file.", variables)
+2,003.3", "The variable 'New_Col' is defined in the data dictionary, but does not appear in the data file.", variables)
   end
 
   it "flags in warning columns that are not in the same order as the data dictionary" do
@@ -55,6 +62,17 @@ describe EMERGE::Phenotype::DataFileValidator do
     process_with_expected_success("SUBJID,Diagnosis\r\n1,10", variables)
   end
 
+  it "skips checking numeric fields if min and max aren't specified" do
+    variables = VARIABLES.clone
+    variables["DIAGNOSIS"][:normalized_type] = :integer
+    variables["DIAGNOSIS"][:min_value] = nil
+    variables["DIAGNOSIS"][:max_value] = 100
+    process_with_expected_success("SUBJID,Diagnosis\r\n1,10", variables)
+    variables["DIAGNOSIS"][:min_value] = nil
+    variables["DIAGNOSIS"][:max_value] = nil
+    process_with_expected_success("SUBJID,Diagnosis\r\n1,10", variables)
+  end
+
   it "flags in error integer fields that look like decimal values" do
     variables = VARIABLES.clone
     variables["DIAGNOSIS"][:normalized_type] = :integer
@@ -63,6 +81,16 @@ describe EMERGE::Phenotype::DataFileValidator do
     process_with_expected_error("SUBJID,Diagnosis\r\n1,7.0",
       "The value '7.0' for 'Diagnosis' (1st row) should be an integer, not a decimal.",
       variables)
+  end
+
+  it "allows integer fields to have missing value" do
+    variables = VARIABLES.clone
+    variables["DIAGNOSIS"][:normalized_type] = :integer
+    variables["DIAGNOSIS"][:min_value] = 6
+    variables["DIAGNOSIS"][:max_value] = 100
+    variables["DIAGNOSIS"][:values] = { "." => "Missing", "NA" => "Not Applicable" }
+    variables["DIAGNOSIS"][:original_values] = { "." => "Missing", "NA" => "Not Applicable" }
+    process_with_expected_success("SUBJID,Diagnosis\r\n1,.", variables)
   end
 
   it "flags in error integer fields that contain alphabetic characters" do
