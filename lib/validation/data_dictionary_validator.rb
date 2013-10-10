@@ -10,7 +10,7 @@ module EMERGE
       EXPECTED_COLUMNS = ["VARNAME", "VARDESC", "SOURCE", "SOURCE ID", "DOCFILE", "TYPE", "UNITS", "MIN", "MAX", "RESOLUTION", "REPEATED MEASURE", "REQUIRED", "COMMENT1", "COMMENT2", "VALUES"]
       REQUIRED_DATA_COLUMNS = ["VARNAME", "VARDESC", "TYPE", "REPEATED MEASURE", "REQUIRED"]
       COLUMN_VALIDATION_REGEX = [
-        [/^[\S]*$/i, "Variable names should not contain spaces"], #Varname
+        [/^[\S]*$/i, "Variable names should not contain spaces (including at the beginning or end of the variable name)"], #Varname
         nil, # Vardesc
         nil, # Source
         nil, # Source ID
