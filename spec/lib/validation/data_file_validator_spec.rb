@@ -124,6 +124,17 @@ describe EMERGE::Phenotype::DataFileValidator do
       variables)
   end
 
+  it "flags in error value fields that are blank" do
+    variables = VARIABLES.clone
+    variables["DIAGNOSIS"][:normalized_type] = :encoded
+    values = { "TEST1" => "VAL1", "TEST2" => "VAL2" }
+    variables["DIAGNOSIS"][:values] = values
+    variables["DIAGNOSIS"][:original_values] = values
+    process_with_expected_error("SUBJID,Diagnosis\r\n1,",
+      "A value for 'Diagnosis' (1st row) is blank, however it is best practice to provide a value to explicitly define missing data.",
+      variables)
+  end
+
   def process_with_expected_warning data, expected_warning, variables
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
     puts validation[:errors] unless validation[:errors].length == 0

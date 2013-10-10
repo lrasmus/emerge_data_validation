@@ -92,8 +92,8 @@ module EMERGE
             next if field[0].nil?
             variable_name = field[0].upcase
             variable = @variables[variable_name]
-            next if variable.nil?
-            next unless variable[:normalized_type] == :encoded
+            next if variable.nil? or variable[:normalized_type] != :encoded # Skip if we don't have a list of values to check against, or this isn't an encoded type
+            next if field[1].nil?
             formatted_value = field[1].upcase
             if !variable[:values].has_key?(formatted_value)
               @results[:errors].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is not listed in the data dictionary.  #{format_list_of_values_for_error(variable[:original_values])}")
