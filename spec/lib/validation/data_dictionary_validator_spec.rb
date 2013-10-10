@@ -47,11 +47,11 @@ Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,Integer,Units,3,5,RESOLUTION,No,
   end
 
   describe "flags in error rows that don't validate" do
-    it "VARNAME" do
+    it "VARNAME with spaces" do
       process_with_expected_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES,
 Invalid variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
 valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES",
-        "'Invalid variable' (1st row), column 'VARNAME' (value = 'Invalid variable') is invalid: Variable names should not contain spaces")
+        "'Invalid variable' (1st row), column 'VARNAME' (value = 'Invalid variable') is invalid: Variable names should not contain spaces (including at the beginning or end of the variable name)")
     end
 
     it "TYPE" do

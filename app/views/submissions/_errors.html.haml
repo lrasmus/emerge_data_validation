@@ -1,0 +1,6 @@
+- unless errors.blank?
+  %h2 Errors
+  .status.error
+    %ul
+      - errors.each do |error|
+        %li= error

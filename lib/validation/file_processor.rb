@@ -9,7 +9,7 @@ module EMERGE
       def initialize(file_content, data_type, delimiter = :csv)
         # Force the file text to end up as UTF-8.  There are issues with some real files unless we explicitly do this
         # The first encode to UTF-16 helps to ensure the encoding is switched & replace is done
-        @file_content = file_content.encode('UTF-16', :invalid => :replace, :undef => :replace, :replace => "").encode('UTF-8')
+        @file_content = file_content.encode('UTF-16', :invalid => :replace, :undef => :replace, :replace => "").encode('UTF-8') unless file_content.nil?
         @data_type = data_type
         @delimiter = delimiter
         process
@@ -27,14 +27,14 @@ module EMERGE
       # rows are accessible.
       def process
         lines = clean_lines
-        @data = CSV.parse(lines.join("\r"), {:headers => true, :skip_blanks => true})
+        @data = CSV.parse(lines.join("\r"), {:headers => true, :skip_blanks => true}) unless lines.nil?
         #@data.delete(nil) # Nil columns should be purged
       end
 
       # Perform cleaning and normalization on the input lines
       #  - Remove lines that have a # as the first non-whitespace character (means it's a comment)
       def clean_lines
-        lines = @file_content.split("\r").select { |line| !line.match(/$\s*#/)}
+        lines = @file_content.split("\r").select { |line| !line.match(/$\s*#/)} unless @file_content.nil?
       end
     end
   end

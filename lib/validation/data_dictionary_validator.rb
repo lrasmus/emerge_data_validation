@@ -10,7 +10,7 @@ module EMERGE
       EXPECTED_COLUMNS = ["VARNAME", "VARDESC", "SOURCE", "SOURCE ID", "DOCFILE", "TYPE", "UNITS", "MIN", "MAX", "RESOLUTION", "REPEATED MEASURE", "REQUIRED", "COMMENT1", "COMMENT2", "VALUES"]
       REQUIRED_DATA_COLUMNS = ["VARNAME", "VARDESC", "TYPE", "REPEATED MEASURE", "REQUIRED"]
       COLUMN_VALIDATION_REGEX = [
-        [/^[\S]*$/i, "Variable names should not contain spaces"], #Varname
+        [/^[\S]*$/i, "Variable names should not contain spaces (including at the beginning or end of the variable name)"], #Varname
         nil, # Vardesc
         nil, # Source
         nil, # Source ID
@@ -38,8 +38,13 @@ module EMERGE
         # Start by performing checks that would prevent us from doing any additional processing.
         return @results unless rows_exist?
         return @results unless variable_name_column_exists?
+
+        # Validate the columns
         check_required_columns
         check_header_columns
+
+        # Validate rows & values in the rows
+        identify_blank_rows
         validate_rows
         check_constraints_for_types
         check_unique_variables
@@ -88,6 +93,7 @@ module EMERGE
           next if found_index.nil? or COLUMN_VALIDATION_REGEX[col_index].nil?
           validation = COLUMN_VALIDATION_REGEX[col_index]
           @file.data.each_with_index do |row, index|
+            next if is_blank_row?(row)
             @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row), column '#{header}' (value = '#{row[found_index]}') is invalid: #{validation[1]}") unless validation[0].match(row[found_index])
           end
         end
@@ -95,6 +101,7 @@ module EMERGE
 
       def check_unique_variables
         @file.data.each_with_index do |row, index|
+          next if is_blank_row?(row)
           if @variables.has_key?(row[0].upcase)
             @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) appears to be a duplicate of the variable '#{@variables[row[0].upcase][:original_name]}' (#{@variables[row[0].upcase][:row].ordinalize} row).")
           else
@@ -134,31 +141,38 @@ module EMERGE
 
       def check_values
         return unless @values_column_valid
-        found_index = @file.headers.index("VALUES")
+        values_column_index = @file.headers.index("VALUES")
         required_column_index = @file.headers.index("REQUIRED")
         @file.data.each_with_index do |row, index|
-          next if row.fields[-1].blank?
+          next if is_blank_row?(row)
           unique_values = Hash.new
+          original_values = Hash.new
           variable = row[0]
           variable_key = variable.upcase
-          values = row.fields[-1].split(';')
+          values = row.fields[values_column_index].split(';') unless row.fields[values_column_index].nil?
           is_required = !(/Yes/i.match(row[required_column_index]).nil?)
           missing_na_value_found = false
-          values.each_with_index do |value, var_index|
-            value ||= ""
-            value_parts = value.split('=')
-            @results[:errors].push("Value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
-            found_item = unique_values[value_parts[0].upcase]
-            if (found_item.nil?)
-              unique_values[value_parts[0].upcase] = value_parts[1]
-            else
-              @results[:errors].push("It appears that the value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is a duplicate value for this variable.")
-            end
+          unless values.blank?
+            values.each_with_index do |value, var_index|
+              value ||= ""
+              value_parts = value.split('=')
+              @results[:errors].push("Value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
+              found_item = unique_values[value_parts[0].upcase]
+              if (found_item.nil?)
+                unique_values[value_parts[0].upcase] = value_parts[1]
+                original_values[value_parts[0]] = value_parts[1]
+              else
+                @results[:errors].push("It appears that the value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is a duplicate value for this variable.")
+              end
 
-            missing_na_value_found = !(/.*missing.*|not applicable|NA|not assessed/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
+              missing_na_value_found = !(/.*missing.*|not applicable|NA|not assessed/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
+            end
           end
 
-          @variables[variable_key][:values] = unique_values unless @variables[variable_key].nil?
+          unless @variables[variable_key].nil?
+            @variables[variable_key][:values] = unique_values
+            @variables[variable_key][:original_values] = original_values
+          end
 
           # Variables that are not required must define a missing or not applicable value
           if !is_required and !missing_na_value_found
@@ -173,11 +187,12 @@ module EMERGE
         min_index = @file.headers.index("MIN")
         max_index = @file.headers.index("MAX")
         @file.data.each_with_index do |row, index|
+          next if is_blank_row?(row)
           variable_key = row[0].upcase
           normalized_type = get_normalized_type(row[type_index])
           @variables[variable_key][:normalized_type] = normalized_type
-          @variables[variable_key][:min_value] = convert_string_to_number(row[min_index], normalized_type) unless min_index.nil?
-          @variables[variable_key][:max_value] = convert_string_to_number(row[max_index], normalized_type) unless max_index.nil?
+          @variables[variable_key][:min_value] = min_index.nil? ? nil : convert_string_to_number(row[min_index], normalized_type)
+          @variables[variable_key][:max_value] = max_index.nil? ? nil : convert_string_to_number(row[max_index], normalized_type)
         end
       end
 

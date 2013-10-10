@@ -1,0 +1,33 @@
+%h1 eMERGE Validation API - v1
+%h2 Submit files for validation
+%div.description{:style => "padding-bottom: 10px"}
+  Submissions may include a data dictionary and optionally a data file.  The validation engine will check the data dictionary and provide a summary report
+  of errors and warnings.  If a data file is also provided, it will be validated against the data dictionary.
+
+%div.method{:style => "margin-left: 20px"}
+  %h3 Request
+  %div{:style => "margin-left: 10px;"}
+    %table
+      %tr
+        %td URL -
+        %td
+          {base_url}/api/v1/submissions
+      %tr
+        %td HTTP Method -
+        %td
+          POST
+      %tr
+        %td Parameters -
+        %td
+          data_dictionary
+          %br
+          data_file
+      %tr
+        %td Format -
+        %td The parameters should be sent as a multipart form.
+
+%div.method{:style => "margin-left: 20px"}
+  %h3 Response
+
+%div.method{:style => "margin-left: 20px"}
+  %h3 Example
