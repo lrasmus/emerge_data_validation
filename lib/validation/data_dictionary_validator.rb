@@ -60,7 +60,7 @@ module EMERGE
 
       def variable_name_column_exists?
         result = @file.headers.include?(EXPECTED_COLUMNS[0])
-        @results[:errors].push("The #{EXPECTED_COLUMNS[0]} column is missing and is required") unless result
+        add_file_error("The #{EXPECTED_COLUMNS[0]} column is missing and is required") unless result
         result
       end
 
@@ -68,7 +68,7 @@ module EMERGE
         REQUIRED_DATA_COLUMNS.each_with_index do |header, index|
           found_index = @file.headers.index(header)
           result ||= !found_index.nil?
-          @results[:errors].push("The #{header} column is missing and is required") if found_index.nil?
+          add_file_error("The #{header} column is missing and is required") if found_index.nil?
         end
       end
 
@@ -76,14 +76,19 @@ module EMERGE
         # Compare against the standard set of headers that we expect
         EXPECTED_COLUMNS.each_with_index do |header, index|
           found_index = @file.headers.index(header)
-          @results[:warnings].push("The #{header} column is missing and should be included") if found_index.nil?
-          @results[:warnings].push("The #{header} column is normally the #{(index + 1).ordinalize} column but in this dictionary is the #{(found_index + 1).ordinalize}") if !found_index.nil? and found_index != index
+          if found_index.nil?
+            add_file_warning("The #{header} column is missing and should be included")
+          elsif !found_index.nil? and found_index != index
+            display_index = found_index + 1
+            add_column_warning(display_index, "The #{header} column is normally the #{(index + 1).ordinalize} column but in this dictionary is the #{display_index.ordinalize}")
+          end
         end
 
         # Check for extra columns that are included
         @file.headers.each_with_index do |header, index|
           found_index = EXPECTED_COLUMNS.index(header)
-          @results[:warnings].push("The #{(index + 1).ordinalize} column, #{header}, is not a standard column in data dictionaries") if found_index.nil?
+          display_index = index + 1
+          add_column_warning(display_index, "The #{display_index.ordinalize} column, #{header}, is not a standard column in data dictionaries") if found_index.nil?
         end
       end
 
@@ -94,7 +99,8 @@ module EMERGE
           validation = COLUMN_VALIDATION_REGEX[col_index]
           @file.data.each_with_index do |row, index|
             next if is_blank_row?(row)
-            @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row), column '#{header}' (value = '#{row[found_index]}') is invalid: #{validation[1]}") unless validation[0].match(row[found_index])
+            display_index = index + 1
+            add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row), column '#{header}' (value = '#{row[found_index]}') is invalid: #{validation[1]}") unless validation[0].match(row[found_index])
           end
         end
       end
@@ -103,7 +109,8 @@ module EMERGE
         @file.data.each_with_index do |row, index|
           next if is_blank_row?(row)
           if @variables.has_key?(row[0].upcase)
-            @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) appears to be a duplicate of the variable '#{@variables[row[0].upcase][:original_name]}' (#{@variables[row[0].upcase][:row].ordinalize} row).")
+            display_index = index + 1
+            add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) appears to be a duplicate of the variable '#{@variables[row[0].upcase][:original_name]}' (#{@variables[row[0].upcase][:row].ordinalize} row).")
           else
             @variables[row[0].upcase] = {:values => nil, :row => (index + 1), :original_name => row[0], :normalized_type => nil}
           end
@@ -118,7 +125,8 @@ module EMERGE
         return if found_index.nil?
         @file.headers[(found_index+1)..@file.headers.length].each_with_index do |header, index|
           unless header.nil? or header.strip.blank?
-            @results[:errors].push("The VALUES column (#{(found_index + 1).ordinalize} column) must be the last, non-empty column")
+            display_index = found_index + 1
+            add_column_error(display_index, "The VALUES column (#{display_index.ordinalize} column) must be the last, non-empty column")
             @values_column_valid = false
             break
           end
@@ -133,9 +141,10 @@ module EMERGE
         max_index = @file.headers.index("MAX")
         @file.data.each_with_index do |row, index|
           next unless (row[type_index] == "Decimal" or row[type_index] == "Integer")
-          @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) is missing units - this is required for variables of type '#{row[type_index]}'") unless units_index.nil? or !row[units_index].blank?
-          @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) is missing a minimum value - this is required for variables of type '#{row[type_index]}'") unless min_index.nil? or !row[min_index].blank?
-          @results[:errors].push("'#{row[0]}' (#{(index + 1).ordinalize} row) is missing a maximum value - this is required for variables of type '#{row[type_index]}'") unless max_index.nil? or !row[max_index].blank?
+          display_index = index + 1
+          add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) is missing units - this is required for variables of type '#{row[type_index]}'") unless units_index.nil? or !row[units_index].blank?
+          add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) is missing a minimum value - this is required for variables of type '#{row[type_index]}'") unless min_index.nil? or !row[min_index].blank?
+          add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) is missing a maximum value - this is required for variables of type '#{row[type_index]}'") unless max_index.nil? or !row[max_index].blank?
         end
       end
 
@@ -152,17 +161,18 @@ module EMERGE
           values = row.fields[values_column_index].split(';') unless row.fields[values_column_index].nil?
           is_required = !(/Yes/i.match(row[required_column_index]).nil?)
           missing_na_value_found = false
+          display_index = index + 1
           unless values.blank?
             values.each_with_index do |value, var_index|
               value ||= ""
               value_parts = value.split('=')
-              @results[:errors].push("Value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
+              add_row_error(display_index, "Value '#{value}' for variable '#{variable}' (#{display_index.ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
               found_item = unique_values[value_parts[0].upcase]
               if (found_item.nil?)
                 unique_values[value_parts[0].upcase] = value_parts[1]
                 original_values[value_parts[0]] = value_parts[1]
               else
-                @results[:errors].push("It appears that the value '#{value}' for variable '#{variable}' (#{(index + 1).ordinalize} row) is a duplicate value for this variable.")
+                add_row_error(display_index, "It appears that the value '#{value}' for variable '#{variable}' (#{display_index.ordinalize} row) is a duplicate value for this variable.")
               end
 
               missing_na_value_found = !(/.*missing.*|not applicable|NA|not assessed/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
@@ -176,7 +186,7 @@ module EMERGE
 
           # Variables that are not required must define a missing or not applicable value
           if !is_required and !missing_na_value_found
-            @results[:errors].push("The optional variable '#{variable}' (#{(index + 1).ordinalize} row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.")
+            add_row_error(display_index, "The optional variable '#{variable}' (#{display_index.ordinalize} row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.")
           end
         end
       end

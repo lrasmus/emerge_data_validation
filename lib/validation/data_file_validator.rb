@@ -26,16 +26,17 @@ module EMERGE
 
       def check_variables_used
         @file.headers.each_with_index do |header, index|
+          display_index = index + 1
           if header.nil? or header.strip.blank?
-            @results[:errors].push("The #{(index + 1).ordinalize} column has a blank header - please set the header and define it in the data dictionary.")
+            add_column_error(display_index, "The #{display_index.ordinalize} column has a blank header - please set the header and define it in the data dictionary.")
           elsif !@variables.has_key?(header.upcase)
-            @results[:errors].push("The variable '#{header}' (#{(index + 1).ordinalize} column) is not defined in the data dictionary.")
+            add_column_error(display_index, "The variable '#{header}' (#{display_index.ordinalize} column) is not defined in the data dictionary.")
           end
         end
 
         formatted_headers = @file.headers.map{|x| x.blank? ? "" : x.upcase}
         @variables.keys.each do |variable|
-          @results[:errors].push("The variable '#{@variables[variable][:original_name]}' is defined in the data dictionary, but does not appear in the data file.") unless formatted_headers.include?(variable)
+          add_file_error("The variable '#{@variables[variable][:original_name]}' is defined in the data dictionary, but does not appear in the data file.") unless formatted_headers.include?(variable)
         end
       end
 
@@ -43,15 +44,17 @@ module EMERGE
         formatted_headers = @file.headers.map{|x| x.blank? ? "" : x.upcase}
         formatted_headers.each_with_index do |header, index|
           next unless @variables.has_key?(header)
-          @results[:warnings].push("The variable '#{@file.headers[index]}' (#{(index+1).ordinalize} column) is the #{(@variables[header][:row]).ordinalize} variable in the data dictionary.  It's recommended to have variables in the same order.") if (index+1) != @variables[header][:row]
+          display_index = index + 1
+          add_column_warning(display_index, "The variable '#{@file.headers[index]}' (#{display_index.ordinalize} column) is the #{(@variables[header][:row]).ordinalize} variable in the data dictionary.  It's recommended to have variables in the same order.") if (index+1) != @variables[header][:row]
         end
       end
 
       def check_missing_data
         @file.data.each_with_index do |row, row_index|
           next if is_blank_row?(row)
+          display_index = row_index + 1
           row.each_with_index do |field, field_index|
-            @results[:errors].push("A value for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is blank, however it is best practice to provide a value to explicitly define missing data.") if field[1].nil? or field[1].strip.blank?
+            add_row_error(display_index, "A value for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is blank, however it is best practice to provide a value to explicitly define missing data.") if field[1].nil? or field[1].strip.blank?
           end
         end
       end
@@ -59,6 +62,7 @@ module EMERGE
       def check_numeric_ranges
         @file.data.each_with_index do |row, row_index|
           next if is_blank_row?(row)
+          display_index = row_index + 1
           row.each_with_index do |field, field_index|
             next if field[0].nil?
             variable_name = field[0].upcase
@@ -69,16 +73,16 @@ module EMERGE
             if (variable[:normalized_type] == :integer)
               next if !variable[:values].blank? and variable[:values].has_key?(field[1])
               if field[1] =~ /\./
-                @results[:errors].push("The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) should be an integer, not a decimal.")
+                add_row_error(display_index, "The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) should be an integer, not a decimal.")
               elsif (/[\D]+/ === field[1])
-                @results[:errors].push("The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) should be an integer, but appears to have non-numeric characters.")
+                add_row_error(display_index, "The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) should be an integer, but appears to have non-numeric characters.")
               end
             end
 
             # We only perform the check if both min and max are specified.  They are required in conjunction.
             unless (variable[:min_value].nil? or variable[:max_value].nil? or value.nil?)
               if (value < variable[:min_value] or value > variable[:max_value])
-                @results[:errors].push("The value '#{value}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
+                add_row_error(display_index, "The value '#{value}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
               end
             end
           end
@@ -88,6 +92,7 @@ module EMERGE
       def check_encoded_values
         @file.data.each_with_index do |row, row_index|
           next if is_blank_row?(row)
+          display_index = row_index + 1
           row.each_with_index do |field, field_index|
             next if field[0].nil?
             variable_name = field[0].upcase
@@ -96,10 +101,10 @@ module EMERGE
             next if field[1].nil?
             formatted_value = field[1].upcase
             if !variable[:values].has_key?(formatted_value)
-              @results[:errors].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is not listed in the data dictionary.  #{format_list_of_values_for_error(variable[:original_values])}")
+              add_row_error(display_index, "The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is not listed in the data dictionary.  #{format_list_of_values_for_error(variable[:original_values])}")
             elsif !variable[:original_values].has_key?(field[1])
               correct_val = variable[:original_values].find{|val| val[0].casecmp(field[1]) == 0}
-              @results[:warnings].push("The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is found, but does not match exactly because of capitalization (should be '#{correct_val[0]}').")
+              add_row_warning(display_index, "The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is found, but does not match exactly because of capitalization (should be '#{correct_val[0]}').")
             end
           end
         end

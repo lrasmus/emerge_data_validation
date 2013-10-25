@@ -14,4 +14,8 @@ module SubmissionsHelper
       end
     end
   end
+
+  def results_collection_has_data? collection
+    collection.any?{ |x| x[1].length > 0}
+  end
 end

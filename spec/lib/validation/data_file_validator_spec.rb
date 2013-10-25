@@ -8,46 +8,46 @@ describe EMERGE::Phenotype::DataFileValidator do
   }
 
   it "flags in error a file with only one row" do
-    process_with_expected_error("SUBJID,Diagnosis\r\n", "No rows containing data could be found", VARIABLES)
+    process_with_expected_file_error("SUBJID,Diagnosis\r\n", "No rows containing data could be found", VARIABLES)
   end
 
   it "flags in error a file with a blank column" do
-    process_with_expected_error("SUBJID,
+    process_with_expected_column_error("SUBJID,
 1,109.8
-2,003.3", "The 2nd column has a blank header - please set the header and define it in the data dictionary.", VARIABLES)
+2,003.3", "The 2nd column has a blank header - please set the header and define it in the data dictionary.", VARIABLES, 2)
   end
 
   it "flags in warning a file with a blank line (delimiters only)" do
-    process_with_expected_warning("SUBJID,Diagnosis
+    process_with_expected_row_warning("SUBJID,Diagnosis
 1,109.8
 ,
-2,003.3", "Row 2 appears to be blank and should be removed.", VARIABLES)
+2,003.3", "Row 2 appears to be blank and should be removed.", VARIABLES, 2)
   end
 
   it "flags in error a file where not all columns are used" do
     variables = VARIABLES.clone
     variables["NEW_COL"] = {:values => nil, :row => 3, :original_name => "New_Col", :normailzed_type => :string}
-    process_with_expected_error("SUBJID,Diagnosis
+    process_with_expected_file_error("SUBJID,Diagnosis
 1,109.8
 2,003.3", "The variable 'New_Col' is defined in the data dictionary, but does not appear in the data file.", variables)
   end
 
   it "flags in warning columns that are not in the same order as the data dictionary" do
-    process_with_expected_warning("Diagnosis,SUBJID\r\n1,109.8\r\n2,003.3",
+    process_with_expected_column_warning("Diagnosis,SUBJID\r\n1,109.8\r\n2,003.3",
       "The variable 'Diagnosis' (1st column) is the 2nd variable in the data dictionary.  It's recommended to have variables in the same order.",
-      VARIABLES)
+      VARIABLES, 1)
   end
 
   it "flags in error columns that are not in the data dictionary" do
-    process_with_expected_error("SUBJID,Diagnosis,Test\r\n1,109.8,1\r\n2,003.3,1",
+    process_with_expected_column_error("SUBJID,Diagnosis,Test\r\n1,109.8,1\r\n2,003.3,1",
       "The variable 'Test' (3rd column) is not defined in the data dictionary.",
-      VARIABLES)
+      VARIABLES, 3)
   end
 
   it "flags in error empty/blank fields in data rows" do
-    process_with_expected_error("SUBJID,Diagnosis\r\n1,  \r\n2,003.3",
+    process_with_expected_row_error("SUBJID,Diagnosis\r\n1,  \r\n2,003.3",
       "A value for 'Diagnosis' (1st row) is blank, however it is best practice to provide a value to explicitly define missing data.",
-      VARIABLES)
+      VARIABLES, 1)
   end
 
   it "flags in error numeric fields out of range" do
@@ -55,9 +55,9 @@ describe EMERGE::Phenotype::DataFileValidator do
     variables["DIAGNOSIS"][:normalized_type] = :integer
     variables["DIAGNOSIS"][:min_value] = 6
     variables["DIAGNOSIS"][:max_value] = 100
-    process_with_expected_error("SUBJID,Diagnosis\r\n1,5",
+    process_with_expected_row_error("SUBJID,Diagnosis\r\n1,5",
       "The value '5' for 'Diagnosis' (1st row) is outside of the range defined in the data dictionary (6 to 100).",
-      variables)
+      variables, 1)
 
     process_with_expected_success("SUBJID,Diagnosis\r\n1,10", variables)
   end
@@ -78,9 +78,9 @@ describe EMERGE::Phenotype::DataFileValidator do
     variables["DIAGNOSIS"][:normalized_type] = :integer
     variables["DIAGNOSIS"][:min_value] = 6
     variables["DIAGNOSIS"][:max_value] = 100
-    process_with_expected_error("SUBJID,Diagnosis\r\n1,7.0",
+    process_with_expected_row_error("SUBJID,Diagnosis\r\n1,7.0",
       "The value '7.0' for 'Diagnosis' (1st row) should be an integer, not a decimal.",
-      variables)
+      variables, 1)
   end
 
   it "allows integer fields to have missing value" do
@@ -98,9 +98,9 @@ describe EMERGE::Phenotype::DataFileValidator do
     variables["DIAGNOSIS"][:normalized_type] = :integer
     variables["DIAGNOSIS"][:min_value] = 6
     variables["DIAGNOSIS"][:max_value] = 100
-    process_with_expected_error("SUBJID,Diagnosis\r\n1,7a",
+    process_with_expected_row_error("SUBJID,Diagnosis\r\n1,7a",
       "The value '7a' for 'Diagnosis' (1st row) should be an integer, but appears to have non-numeric characters.",
-      variables)
+      variables, 1)
   end
 
   it "flags in error encoded fields that have an unknown value" do
@@ -108,9 +108,9 @@ describe EMERGE::Phenotype::DataFileValidator do
     variables["DIAGNOSIS"][:normalized_type] = :encoded
     variables["DIAGNOSIS"][:values] = { "TEST1" => "VAL1", "TEST2" => "VAL2" }
     variables["DIAGNOSIS"][:original_values] = { "Test1" => "VAL1", "Test2" => "VAL2" }
-    process_with_expected_error("SUBJID,Diagnosis\r\n1,TEST3",
+    process_with_expected_row_error("SUBJID,Diagnosis\r\n1,TEST3",
       "The value 'TEST3' for the variable 'Diagnosis' (1st row) is not listed in the data dictionary.  It should be one of the following: Test1, Test2",
-      variables)
+      variables, 1)
   end
 
   it "flags with a warning encoded fields that have a known value but mismatched case" do
@@ -119,9 +119,9 @@ describe EMERGE::Phenotype::DataFileValidator do
     values = { "TEST1" => "VAL1", "TEST2" => "VAL2" }
     variables["DIAGNOSIS"][:values] = values
     variables["DIAGNOSIS"][:original_values] = values
-    process_with_expected_warning("SUBJID,Diagnosis\r\n1,test1",
+    process_with_expected_row_warning("SUBJID,Diagnosis\r\n1,test1",
       "The value 'test1' for the variable 'Diagnosis' (1st row) is found, but does not match exactly because of capitalization (should be 'TEST1').",
-      variables)
+      variables, 1)
   end
 
   it "flags in error value fields that are blank" do
@@ -130,33 +130,82 @@ describe EMERGE::Phenotype::DataFileValidator do
     values = { "TEST1" => "VAL1", "TEST2" => "VAL2" }
     variables["DIAGNOSIS"][:values] = values
     variables["DIAGNOSIS"][:original_values] = values
-    process_with_expected_error("SUBJID,Diagnosis\r\n1,",
+    process_with_expected_row_error("SUBJID,Diagnosis\r\n1,",
       "A value for 'Diagnosis' (1st row) is blank, however it is best practice to provide a value to explicitly define missing data.",
-      variables)
+      variables, 1)
   end
 
-  def process_with_expected_warning data, expected_warning, variables
+  #def process_with_expected_warning data, expected_warning, variables
+  #  validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
+  #  puts validation[:errors] unless validation[:errors].length == 0
+  #  validation[:errors].length.should == 0
+  #  validation[:warnings].length.should be > 0
+  #  result = validation[:warnings].include?(expected_warning)
+  #  puts validation[:warnings] unless result
+  #  result.should be_true
+  #end
+
+  #def process_with_expected_error data, expected_error, variables
+  #  validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
+  #  validation[:errors].length.should be > 0
+  #  result = validation[:errors].include?(expected_error)
+  #  puts validation[:errors] unless result
+  #  result.should be_true
+  #end
+
+  def process_with_expected_file_warning data, expected_warning, variables
+    process_with_expected_warning data, expected_warning, variables, :file, nil
+  end
+
+  def process_with_expected_row_warning data, expected_warning, variables, index
+    process_with_expected_warning data, expected_warning, variables, :rows, index
+  end
+
+  def process_with_expected_column_warning data, expected_warning, variables, index
+    process_with_expected_warning data, expected_warning, variables, :columns, index
+  end
+
+  def process_with_expected_warning data, expected_warning, variables, collection, index
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
-    puts validation[:errors] unless validation[:errors].length == 0
-    validation[:errors].length.should == 0
-    validation[:warnings].length.should be > 0
-    result = validation[:warnings].include?(expected_warning)
-    puts validation[:warnings] unless result
+    puts validation[:errors][collection] unless validation[:errors][collection].length == 0
+    validation[:errors][collection].length.should == 0
+    validation[:warnings][collection].length.should be > 0
+    if index.nil?
+      result = validation[:warnings][collection].include?(expected_warning)
+    else
+      result = validation[:warnings][collection][index].include?(expected_warning)
+    end
+    puts validation[:warnings][collection] unless result
     result.should be_true
   end
 
-  def process_with_expected_error data, expected_error, variables
+  def process_with_expected_file_error data, expected_error, variables
+    process_with_expected_error data, expected_error, variables, :file, nil
+  end
+
+  def process_with_expected_row_error data, expected_error, variables, index
+    process_with_expected_error data, expected_error, variables, :rows, index
+  end
+
+  def process_with_expected_column_error data, expected_error, variables, index
+    process_with_expected_error data, expected_error, variables, :columns, index
+  end
+
+  def process_with_expected_error data, expected_error, variables, collection, index
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
-    validation[:errors].length.should be > 0
-    result = validation[:errors].include?(expected_error)
-    puts validation[:errors] unless result
+    validation[:errors][collection].length.should be > 0
+    if index.nil?
+      result = validation[:errors][collection].include?(expected_error)
+    else
+      result = validation[:errors][collection][index].include?(expected_error)
+    end
+    puts validation[:errors][collection] unless result
     result.should be_true
   end
 
   def process_with_expected_success data, variables
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
-    puts validation[:errors] unless validation[:errors].blank?
-    validation[:errors].length.should eql 0
-    validation[:warnings].length.should eql 0
+    validation[:errors].each{ |x| x[1].length.should eql 0 }
+    validation[:warnings].each { |x| x[1].length.should eql 0 }
   end
 end

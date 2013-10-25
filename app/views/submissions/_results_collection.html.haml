@@ -1,0 +1,25 @@
+- if results_collection_has_data?(results_collection[collection])
+  .message-collection
+    %h2=collection.to_s.titleize
+    - results_collection[collection].each do |level|
+      - unless level[1].length == 0
+        - title = level[0].to_s.titleize
+        - item_type = title.singularize
+        .message-type
+          %h3=title
+          .status{:class => collection.downcase}
+            %ul
+              - if level[1].first.is_a?(Array)
+                - level[1].sort.each do |item|
+                  %li
+                    = "#{item_type} #{item[0]}"
+                    - if item[1].count == 1
+                      = "- #{item[1].first}"
+                    - else
+                      %ul
+                        - item[1].each do |message|
+                          %li= message
+              - else
+                - level[1].each do |item|
+                  %li
+                    = item

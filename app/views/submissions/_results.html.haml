@@ -7,5 +7,5 @@
       .status.passed
         %ul
           %li No warnings or errors were detected
-    = render "warnings", {:warnings => results[:warnings]}
-    = render "errors", {:errors => results[:errors]}
+    = render :partial => "results_collection", :locals => {:results_collection => results, :collection => :warnings }
+    = render :partial => "results_collection", :locals => {:results_collection => results, :collection => :errors }

@@ -8,12 +8,18 @@ module EMERGE
     class BaseValidator
       def initialize(data, file_type, delimiter = :csv)
         @file = FileProcessor.new(data, file_type, delimiter)
-        @results = {:errors => [], :warnings => []}
+        @results = {:errors => Hash.new, :warnings => Hash.new}
+        initialize_results_container_collection(:errors)
+        initialize_results_container_collection(:warnings)
+      end
+
+      def results
+        @results
       end
 
       def rows_exist?
         result = !(@file.nil? or @file.headers.blank? or @file.data.blank?)
-        @results[:errors].push("No rows containing data could be found") unless result
+        add_file_error("No rows containing data could be found") unless result
         result
       end
 
@@ -36,8 +42,50 @@ module EMERGE
 
       def identify_blank_rows
         @file.data.each_with_index do |row, row_index|
-          @results[:warnings].push("Row #{row_index+1} appears to be blank and should be removed.") if is_blank_row?(row)
+          display_index = row_index + 1
+          add_row_warning(display_index, "Row #{display_index} appears to be blank and should be removed.") if is_blank_row?(row)
         end
+      end
+
+      def add_file_error message
+        add_results_message :errors, :file, message, nil
+      end
+
+      def add_file_warning message
+        add_results_message :warnings, :file, message, nil
+      end
+
+      def add_row_error row_index, message
+        add_results_message :errors, :rows, message, row_index
+      end
+
+      def add_row_warning row_index, message
+        add_results_message :warnings, :rows, message, row_index
+      end
+
+      def add_column_error column_index, message
+        add_results_message :errors, :columns, message, column_index
+      end
+
+      def add_column_warning column_index, message
+        add_results_message :warnings, :columns, message, column_index
+      end
+
+      private
+
+      def add_results_message collection, type, message, index
+        if type == :file
+          @results[collection][type].push(message)
+        else
+          @results[collection][type][index] = [] unless @results[collection][type].has_key?(index)
+          @results[collection][type][index].push(message)
+        end
+      end
+
+      def initialize_results_container_collection collection
+        @results[collection][:file] = []
+        @results[collection][:rows] = Hash.new
+        @results[collection][:columns] = Hash.new
       end
     end
   end
