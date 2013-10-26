@@ -12,6 +12,7 @@ class Api::V1::SubmissionsController < Api::V1::ApiController
     get_data_from_params(params[:data_dictionary], params[:data_file])
     respond_to do |format|
       format.json { render :json => { :dictionary_file => @data_dictionary_results, :data_file => @data_file_results }.to_json }
+      format.html { render "submissions/report"}
     end
   end
 
