@@ -84,8 +84,8 @@ module EMERGE
 
       def initialize_results_container_collection collection
         @results[collection][:file] = []
-        @results[collection][:rows] = Hash.new
         @results[collection][:columns] = Hash.new
+        @results[collection][:rows] = Hash.new
       end
     end
   end
