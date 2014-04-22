@@ -43,7 +43,6 @@ group :test, :ci do
   gem 'database_cleaner'
   gem 'shoulda'
   gem 'factory_girl'
-  gem 'simplecov', :require => false
   gem 'pickle'
   gem 'fakeweb'
   gem 'webmock', :require => false
