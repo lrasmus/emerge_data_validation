@@ -1,8 +1,8 @@
 - if results_collection_has_data?(results_collection[collection])
   .message-collection
-    %h2=collection.to_s.titleize
+    %h2=collection_title(collection, results_collection[collection][:summary])
     - results_collection[collection].each do |level|
-      - unless level[1].length == 0
+      - unless level[0] == :summary or level[1].length == 0
         - title = level[0].to_s.titleize
         - item_type = title.singularize
         .message-type
