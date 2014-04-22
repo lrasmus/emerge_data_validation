@@ -17,6 +17,14 @@ module EMERGE
         @results
       end
 
+      def summarize
+        @results.keys.each do |collection|
+          @results[collection][:summary].keys.find_all{|x| x != :summary}.each do |item_type|
+            count_items_for_summary collection, item_type
+          end
+        end
+      end
+
       def rows_exist?
         result = !(@file.nil? or @file.headers.blank? or @file.data.blank?)
         add_file_error("No rows containing data could be found") unless result
@@ -86,6 +94,21 @@ module EMERGE
         @results[collection][:file] = []
         @results[collection][:columns] = Hash.new
         @results[collection][:rows] = Hash.new
+
+        #Summarize all of the item types listed above
+        @results[collection][:summary] = Hash.new
+        @results[collection].keys.find_all{|x| x != :summary}.each {|item_type| @results[collection][:summary][item_type] = 0 }
+      end
+
+      private
+      def count_items_for_summary collection, item_type
+        total = 0
+        if @results[collection][item_type].is_a? Hash
+          @results[collection][item_type].each{|x| total += x[1].count}
+        else
+          total = @results[collection][item_type].count
+        end
+        @results[collection][:summary][item_type] = total
       end
     end
   end

@@ -18,4 +18,13 @@ module SubmissionsHelper
   def results_collection_has_data? collection
     collection.any?{ |x| x[1].length > 0}
   end
+
+  def collection_title collection, summary
+    title = collection.to_s.titleize
+    unless summary.blank?
+      total = 0
+      summary.each {|x| total += x[1] }
+      title = title + " (#{total})"
+    end
+  end
 end
