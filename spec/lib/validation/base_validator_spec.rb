@@ -50,4 +50,21 @@ describe EMERGE::Phenotype::BaseValidator do
       @validator.results[:warnings][:rows][3].should be_nil
     end
   end
+
+
+  describe "summarizes results" do
+    it "initializes counts to 0" do
+      @validator.results[:errors][:summary].keys.count.should eql 3
+    end
+
+    it "counts all entries" do
+      @validator.add_row_warning(1, "Test message new 1")
+      @validator.add_row_warning(2, "Test message new 2")
+      @validator.add_row_warning(1, "Test message other 1")
+      @validator.summarize
+      @validator.results[:warnings][:summary][:rows].should eql 3
+      @validator.results[:warnings][:summary][:columns].should eql 0
+      @validator.results[:warnings][:summary][:file].should eql 0
+    end
+  end
 end

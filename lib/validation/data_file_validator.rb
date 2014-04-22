@@ -21,6 +21,7 @@ module EMERGE
         check_missing_data
         check_numeric_ranges
         check_encoded_values
+        summarize
         @results
       end
 
