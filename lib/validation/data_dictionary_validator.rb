@@ -51,7 +51,6 @@ module EMERGE
         check_values_column_position
         check_values
         set_variable_constraints
-        summarize
         @results
       end
 

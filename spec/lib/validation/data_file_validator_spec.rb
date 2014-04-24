@@ -205,7 +205,7 @@ describe EMERGE::Phenotype::DataFileValidator do
 
   def process_with_expected_success data, variables
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
-    validation[:errors].each{ |x| x[1].length.should eql 0 unless x[0] == :summary }
-    validation[:warnings].each { |x| x[1].length.should eql 0 unless x[0] == :summary }
+    validation[:errors].each{ |x| x[1].length.should eql 0 }
+    validation[:warnings].each { |x| x[1].length.should eql 0 }
   end
 end
