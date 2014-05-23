@@ -7,10 +7,14 @@ module EMERGE
     # Author::    Luke Rasmussen (mailto:luke.rasmussen@northwestern.edu)
     class BaseValidator
       def initialize(data, file_type, delimiter = :csv)
-        @file = FileProcessor.new(data, file_type, delimiter)
         @results = {:errors => Hash.new, :warnings => Hash.new}
         initialize_results_container_collection(:errors)
         initialize_results_container_collection(:warnings)
+        begin
+          @file = FileProcessor.new(data, file_type, delimiter)
+        rescue CSV::MalformedCSVError => exc
+          add_file_error "The file does not appear to be a properly formatted CSV document: #{exc}"
+        end
       end
 
       def results
@@ -19,7 +23,7 @@ module EMERGE
 
       def rows_exist?
         result = !(@file.nil? or @file.headers.blank? or @file.data.blank?)
-        add_file_error("No rows containing data could be found") unless result
+        add_file_error("No validrows containing data could be found") unless result
         result
       end
 
