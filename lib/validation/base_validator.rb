@@ -6,8 +6,9 @@ module EMERGE
     #
     # Author::    Luke Rasmussen (mailto:luke.rasmussen@northwestern.edu)
     class BaseValidator
-      def initialize(data, file_type, delimiter = :csv)
+      def initialize(data, file_type, delimiter = :csv, error_limit = nil)
         @results = {:errors => Hash.new, :warnings => Hash.new}
+        @error_limit = error_limit
         initialize_results_container_collection(:errors)
         initialize_results_container_collection(:warnings)
         begin
@@ -21,9 +22,13 @@ module EMERGE
         @results
       end
 
+      def at_result_collection_limit? collection, level
+        @error_limit.nil? ? false : @results[collection][level].length >= @error_limit
+      end
+
       def rows_exist?
-        result = !(@file.nil? or @file.headers.blank? or @file.data.blank?)
-        add_file_error("No validrows containing data could be found") unless result
+        result = (!(@file.nil?) and @file.rows_exist?)
+        add_file_error("No valid rows containing data could be found") unless result
         result
       end
 
@@ -44,11 +49,11 @@ module EMERGE
         true
       end
 
-      def identify_blank_rows
-        @file.data.each_with_index do |row, row_index|
-          display_index = row_index + 1
-          add_row_warning(display_index, "Row #{display_index} appears to be blank and should be removed.") if is_blank_row?(row)
-        end
+      def check_blank_row row, row_index
+        display_index = row_index + 1
+        blank_row = is_blank_row?(row)
+        add_row_warning(display_index, "Row #{display_index} appears to be blank and should be removed.") if blank_row
+        blank_row
       end
 
       def add_file_error message

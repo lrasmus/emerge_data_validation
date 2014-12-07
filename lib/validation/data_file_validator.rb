@@ -7,20 +7,28 @@ module EMERGE
     #
     # Author::    Luke Rasmussen (mailto:luke.rasmussen@northwestern.edu)
     class DataFileValidator < BaseValidator
-      def initialize(data, variables, delimiter = :csv)
+      def initialize(data, variables, delimiter = :csv, error_limit = nil)
         @variables = variables
-        super(data, :data_file, delimiter)
+        super(data, :data_file, delimiter, error_limit)
       end
 
       def validate
         # Start by performing checks that would prevent us from doing any additional processing.
         return @results unless rows_exist?
-        identify_blank_rows
         check_variables_used
         check_variable_order
-        check_missing_data
-        check_numeric_ranges
-        check_encoded_values
+
+        row_index = 0
+        CSV.parse(@file.file_content, {:headers => true, :skip_blanks => true}) do |row|
+          next if check_blank_row(row, row_index)
+          break if at_result_collection_limit?(:errors, :rows)
+          check_missing_data_for_row(row, row_index)
+          check_numeric_ranges_for_row(row, row_index)
+          check_encoded_values_for_row(row, row_index)
+
+          row_index = row_index + 1
+        end
+
         @results
       end
 
@@ -49,63 +57,54 @@ module EMERGE
         end
       end
 
-      def check_missing_data
-        @file.data.each_with_index do |row, row_index|
-          next if is_blank_row?(row)
-          display_index = row_index + 1
-          row.each_with_index do |field, field_index|
-            add_row_error(display_index, "A value for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is blank, however it is best practice to provide a value to explicitly define missing data.") if field[1].nil? or field[1].strip.blank?
-          end
+      def check_missing_data_for_row row, row_index
+        display_index = row_index + 1
+        row.each_with_index do |field, field_index|
+          add_row_error(display_index, "A value for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is blank, however it is best practice to provide a value to explicitly define missing data.") if field[1].nil? or field[1].strip.blank?
         end
       end
 
-      def check_numeric_ranges
-        @file.data.each_with_index do |row, row_index|
-          next if is_blank_row?(row)
-          display_index = row_index + 1
-          row.each_with_index do |field, field_index|
-            next if field[0].nil?
-            variable_name = field[0].upcase
-            variable = @variables[variable_name]
-            next if variable.nil?
-            next unless variable[:normalized_type] == :integer or variable[:normalized_type] == :decimal
-            value = convert_string_to_number(field[1], variable[:normalized_type])
-            if (variable[:normalized_type] == :integer)
-              next if !variable[:values].blank? and variable[:values].has_key?(field[1])
-              if field[1] =~ /\./
-                add_row_error(display_index, "The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) should be an integer, not a decimal.")
-              elsif (/[\D]+/ === field[1])
-                add_row_error(display_index, "The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) should be an integer, but appears to have non-numeric characters.")
-              end
+      def check_numeric_ranges_for_row row, row_index
+        display_index = row_index + 1
+        row.each_with_index do |field, field_index|
+          next if field[0].nil?
+          variable_name = field[0].upcase
+          variable = @variables[variable_name]
+          next if variable.nil?
+          next unless variable[:normalized_type] == :integer or variable[:normalized_type] == :decimal
+          value = convert_string_to_number(field[1], variable[:normalized_type])
+          if (variable[:normalized_type] == :integer)
+            next if !variable[:values].blank? and variable[:values].has_key?(field[1])
+            if field[1] =~ /\./
+              add_row_error(display_index, "The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) should be an integer, not a decimal.")
+            elsif (/[\D]+/ === field[1])
+              add_row_error(display_index, "The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) should be an integer, but appears to have non-numeric characters.")
             end
+          end
 
-            # We only perform the check if both min and max are specified.  They are required in conjunction.
-            unless (variable[:min_value].nil? or variable[:max_value].nil? or value.nil?)
-              if (value < variable[:min_value] or value > variable[:max_value])
-                add_row_error(display_index, "The value '#{value}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
-              end
+          # We only perform the check if both min and max are specified.  They are required in conjunction.
+          unless (variable[:min_value].nil? or variable[:max_value].nil? or value.nil?)
+            if (value < variable[:min_value] or value > variable[:max_value])
+              add_row_error(display_index, "The value '#{value}' for '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).")
             end
           end
         end
       end
 
-      def check_encoded_values
-        @file.data.each_with_index do |row, row_index|
-          next if is_blank_row?(row)
-          display_index = row_index + 1
-          row.each_with_index do |field, field_index|
-            next if field[0].nil?
-            variable_name = field[0].upcase
-            variable = @variables[variable_name]
-            next if variable.nil? or variable[:normalized_type] != :encoded # Skip if we don't have a list of values to check against, or this isn't an encoded type
-            next if field[1].nil?
-            formatted_value = field[1].upcase
-            if !variable[:values].has_key?(formatted_value)
-              add_row_error(display_index, "The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is not listed in the data dictionary.  #{format_list_of_values_for_error(variable[:original_values])}")
-            elsif !variable[:original_values].has_key?(field[1])
-              correct_val = variable[:original_values].find{|val| val[0].casecmp(field[1]) == 0}
-              add_row_warning(display_index, "The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is found, but does not match exactly because of capitalization (should be '#{correct_val[0]}').")
-            end
+      def check_encoded_values_for_row row, row_index
+        display_index = row_index + 1
+        row.each_with_index do |field, field_index|
+          next if field[0].nil?
+          variable_name = field[0].upcase
+          variable = @variables[variable_name]
+          next if variable.nil? or variable[:normalized_type] != :encoded # Skip if we don't have a list of values to check against, or this isn't an encoded type
+          next if field[1].nil?
+          formatted_value = field[1].upcase
+          if !variable[:values].has_key?(formatted_value)
+            add_row_error(display_index, "The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is not listed in the data dictionary.  #{format_list_of_values_for_error(variable[:original_values])}")
+          elsif !variable[:original_values].has_key?(field[1])
+            correct_val = variable[:original_values].find{|val| val[0].casecmp(field[1]) == 0}
+            add_row_warning(display_index, "The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{display_index.ordinalize} row) is found, but does not match exactly because of capitalization (should be '#{correct_val[0]}').")
           end
         end
       end

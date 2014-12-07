@@ -27,8 +27,8 @@ module EMERGE
         nil  # Values
       ]
 
-      def initialize(data_dictionary_data, delimiter = :csv)
-        super(data_dictionary_data, :data_dictionary, delimiter)
+      def initialize(data_dictionary_data, delimiter = :csv, error_limit = nil)
+        super(data_dictionary_data, :data_dictionary, delimiter, error_limit)
         @variables = Hash.new
         @values_column_valid = false
         #@values = Hash.new
@@ -43,14 +43,21 @@ module EMERGE
         check_required_columns
         check_header_columns
 
-        # Validate rows & values in the rows
-        identify_blank_rows
-        validate_rows
-        check_constraints_for_types
-        check_unique_variables
         check_values_column_position
-        check_values
-        set_variable_constraints
+
+        # Validate rows & values in the rows
+        row_index = 0
+        CSV.parse(@file.file_content, {:headers => true, :skip_blanks => true}) do |row|
+          validate_row(row, row_index)
+          check_constraints_for_types_in_row(row, row_index)
+          check_unique_variable_in_row(row, row_index)
+          check_values_in_row(row, row_index)
+          set_variable_constraints_in_row(row, row_index)
+          check_blank_row(row, row_index)
+
+          row_index = row_index + 1
+        end
+
         @results
       end
 
@@ -92,27 +99,26 @@ module EMERGE
         end
       end
 
-      def validate_rows
+      def validate_row(row, row_index)
         EXPECTED_COLUMNS.each_with_index do |header, col_index|
           found_index = @file.headers.index(header)
           next if found_index.nil? or COLUMN_VALIDATION_REGEX[col_index].nil?
           validation = COLUMN_VALIDATION_REGEX[col_index]
-          @file.data.each_with_index do |row, index|
-            next if is_blank_row?(row)
-            display_index = index + 1
+          unless is_blank_row?(row)
+            display_index = row_index + 1
             add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row), column '#{header}' (value = '#{row[found_index]}') is invalid: #{validation[1]}") unless validation[0].match(row[found_index])
           end
         end
       end
 
-      def check_unique_variables
-        @file.data.each_with_index do |row, index|
-          next if is_blank_row?(row)
-          if @variables.has_key?(row[0].upcase)
-            display_index = index + 1
+      def check_unique_variable_in_row(row, row_index)
+        unless is_blank_row?(row)
+          variable_name = row[0].upcase
+          if @variables.has_key?(variable_name)
+            display_index = row_index + 1
             add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) appears to be a duplicate of the variable '#{@variables[row[0].upcase][:original_name]}' (#{@variables[row[0].upcase][:row].ordinalize} row).")
           else
-            @variables[row[0].upcase] = {:values => nil, :row => (index + 1), :original_name => row[0], :normalized_type => nil}
+            @variables[variable_name] = {:values => nil, :row => (row_index + 1), :original_name => row[0], :normalized_type => nil}
           end
         end
       end
@@ -133,27 +139,25 @@ module EMERGE
         end
       end
 
-      def check_constraints_for_types
+      def check_constraints_for_types_in_row(row, row_index)
         type_index = @file.headers.index("TYPE")
         return if type_index.nil?
         units_index = @file.headers.index("UNITS")
         min_index = @file.headers.index("MIN")
         max_index = @file.headers.index("MAX")
-        @file.data.each_with_index do |row, index|
-          next unless (row[type_index] == "Decimal" or row[type_index] == "Integer")
-          display_index = index + 1
+        if (row[type_index] == "Decimal" or row[type_index] == "Integer")
+          display_index = row_index + 1
           add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) is missing units - this is required for variables of type '#{row[type_index]}'") unless units_index.nil? or !row[units_index].blank?
           add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) is missing a minimum value - this is required for variables of type '#{row[type_index]}'") unless min_index.nil? or !row[min_index].blank?
           add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) is missing a maximum value - this is required for variables of type '#{row[type_index]}'") unless max_index.nil? or !row[max_index].blank?
         end
       end
 
-      def check_values
+      def check_values_in_row(row, row_index)
         return unless @values_column_valid
         values_column_index = @file.headers.index("VALUES")
         required_column_index = @file.headers.index("REQUIRED")
-        @file.data.each_with_index do |row, index|
-          next if is_blank_row?(row)
+        unless is_blank_row?(row)
           unique_values = Hash.new
           original_values = Hash.new
           variable = row[0]
@@ -161,7 +165,7 @@ module EMERGE
           values = row.fields[values_column_index].split(';') unless row.fields[values_column_index].nil?
           is_required = !(/Yes/i.match(row[required_column_index]).nil?)
           missing_na_value_found = false
-          display_index = index + 1
+          display_index = row_index + 1
           unless values.blank?
             values.each_with_index do |value, var_index|
               value ||= ""
@@ -191,13 +195,12 @@ module EMERGE
         end
       end
 
-      def set_variable_constraints
+      def set_variable_constraints_in_row(row, row_index)
         type_index = @file.headers.index("TYPE")
         return if type_index.nil?
         min_index = @file.headers.index("MIN")
         max_index = @file.headers.index("MAX")
-        @file.data.each_with_index do |row, index|
-          next if is_blank_row?(row)
+        unless is_blank_row?(row)
           variable_key = row[0].upcase
           normalized_type = get_normalized_type(row[type_index])
           @variables[variable_key][:normalized_type] = normalized_type

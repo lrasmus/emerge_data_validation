@@ -12,23 +12,38 @@ module EMERGE
         @file_content = file_content.encode('UTF-16', :invalid => :replace, :undef => :replace, :replace => "").encode('UTF-8') unless file_content.nil?
         @data_type = data_type
         @delimiter = delimiter
+        @headers = []
+        @rows_exist = false
         process
       end
 
       def headers
-        @data.headers
+        @headers
       end
 
-      def data
-        @data
+      def file_content
+        return @file_content
+      end
+
+      def rows_exist?
+        @rows_exist
       end
 
       # Take the data for this file and perform basic cleaning and normalization so that a header and data
       # rows are accessible.
       def process
         lines = clean_lines
-        @data = CSV.parse(lines.join("\r"), {:headers => true, :skip_blanks => true}) unless lines.nil?
-        #@data.delete(nil) # Nil columns should be purged
+
+        # Peek ahead to get the headers
+        unless @file_content.blank?
+          CSV.parse(@file_content, {:headers => true, :skip_blanks => true}) do |row|
+            @rows_exist = true
+            @headers = row.headers
+            break
+          end
+        end
+
+        @rows_exist = @rows_exist and !@headers.blank?
       end
 
       # Perform cleaning and normalization on the input lines

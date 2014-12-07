@@ -1,0 +1,1 @@
+ValidationParameters = YAML.load(ERB.new(File.read("#{Rails.root}/config/validation.yml")).result)[Rails.env]

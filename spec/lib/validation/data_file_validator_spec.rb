@@ -8,7 +8,7 @@ describe EMERGE::Phenotype::DataFileValidator do
   }
 
   it "flags in error a file with only one row" do
-    process_with_expected_file_error("SUBJID,Diagnosis\r\n", "No rows containing data could be found", VARIABLES)
+    process_with_expected_file_error("SUBJID,Diagnosis\r\n", "No valid rows containing data could be found", VARIABLES)
   end
 
   it "flags in error a file with a blank column" do
@@ -135,22 +135,35 @@ describe EMERGE::Phenotype::DataFileValidator do
       variables, 1)
   end
 
+  describe "utilize error limit" do
+    it "stops processing after error limit reached" do
+      variables = VARIABLES.clone
+      variables["DIAGNOSIS"][:normalized_type] = :encoded
+      values = { "TEST1" => "VAL1", "TEST2" => "VAL2" }
+      variables["DIAGNOSIS"][:values] = values
+      variables["DIAGNOSIS"][:original_values] = values
+
+      validation = EMERGE::Phenotype::DataFileValidator.new("SUBJID,Diagnosis\r\n1,\r\n2,\r\n3,", variables, :csv, 2).validate
+      expect(validation[:errors][:rows].length).to eq 2
+    end
+  end
+
   #def process_with_expected_warning data, expected_warning, variables
   #  validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
-  #  puts validation[:errors] unless validation[:errors].length == 0
-  #  validation[:errors].length.should == 0
-  #  validation[:warnings].length.should be > 0
+  #  puts validation[:errors] unless validation[:errors].length eq 0
+  #  validation[:errors].length).should eq 0
+  #  validation[:warnings].length).should be > 0
   #  result = validation[:warnings].include?(expected_warning)
   #  puts validation[:warnings] unless result
-  #  result.should be_true
+  #  result).should be true
   #end
 
   #def process_with_expected_error data, expected_error, variables
   #  validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
-  #  validation[:errors].length.should be > 0
+  #  validation[:errors].length).should be > 0
   #  result = validation[:errors].include?(expected_error)
   #  puts validation[:errors] unless result
-  #  result.should be_true
+  #  result).should be true
   #end
 
   def process_with_expected_file_warning data, expected_warning, variables
@@ -168,15 +181,15 @@ describe EMERGE::Phenotype::DataFileValidator do
   def process_with_expected_warning data, expected_warning, variables, collection, index
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
     puts validation[:errors][collection] unless validation[:errors][collection].length == 0
-    validation[:errors][collection].length.should == 0
-    validation[:warnings][collection].length.should be > 0
+    expect(validation[:errors][collection].length).to eq 0
+    expect(validation[:warnings][collection].length).to be > 0
     if index.nil?
       result = validation[:warnings][collection].include?(expected_warning)
     else
       result = validation[:warnings][collection][index].include?(expected_warning)
     end
     puts validation[:warnings][collection] unless result
-    result.should be_true
+    expect(result).to be true
   end
 
   def process_with_expected_file_error data, expected_error, variables
@@ -193,19 +206,19 @@ describe EMERGE::Phenotype::DataFileValidator do
 
   def process_with_expected_error data, expected_error, variables, collection, index
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
-    validation[:errors][collection].length.should be > 0
+    expect(validation[:errors][collection].length).to be > 0
     if index.nil?
       result = validation[:errors][collection].include?(expected_error)
     else
       result = validation[:errors][collection][index].include?(expected_error)
     end
     puts validation[:errors][collection] unless result
-    result.should be_true
+    expect(result).to be true
   end
 
   def process_with_expected_success data, variables
     validation = EMERGE::Phenotype::DataFileValidator.new(data, variables, :csv).validate
-    validation[:errors].each{ |x| x[1].length.should eql 0 }
-    validation[:warnings].each { |x| x[1].length.should eql 0 }
+    validation[:errors].each{ |x| expect(x[1].length).to eql 0 }
+    validation[:warnings].each { |x| expect(x[1].length).to eql 0 }
   end
 end
