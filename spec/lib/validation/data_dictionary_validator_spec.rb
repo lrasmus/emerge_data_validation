@@ -115,6 +115,36 @@ Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No
       "The optional variable 'Valid_Variable' (1st row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.", 1)
   end
 
+  it "counts blank rows in the list of errors" do
+    process_with_expected_row_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=1
+,,,,,,,,,,,,,,
+Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=2",
+      "'Valid_Variable' (3rd row) appears to be a duplicate of the variable 'valid_variable' (1st row).", 3)
+  end
+
+  it "skips empty rows when storing variables" do
+    validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=1
+,,,,,,,,,,,,,,
+Other_Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=2", :csv)
+    validation.validate
+    expect(validation.variables.length).to eq 2
+    expect(validation.variables['OTHER_VALID_VARIABLE'][:row]).to eq 3
+    expect(validation.variables['OTHER_VALID_VARIABLE'][:variable_num]).to eq 2
+  end
+
+  it "skips blank rows when storing variables" do
+    validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=1
+ 
+Other_Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=2", :csv)
+    validation.validate
+    expect(validation.variables.length).to eq 2
+    expect(validation.variables['OTHER_VALID_VARIABLE'][:row]).to eq 3
+    expect(validation.variables['OTHER_VALID_VARIABLE'][:variable_num]).to eq 2
+  end
+
   def process_with_expected_file_warning data, expected_warning
     process_with_expected_warning data, expected_warning, :file, nil
   end

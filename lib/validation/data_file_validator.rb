@@ -53,7 +53,7 @@ module EMERGE
         formatted_headers.each_with_index do |header, index|
           next unless @variables.has_key?(header)
           display_index = index + 1
-          add_column_warning(display_index, "The variable '#{@file.headers[index]}' (#{display_index.ordinalize} column) is the #{(@variables[header][:row]).ordinalize} variable in the data dictionary.  It's recommended to have variables in the same order.") if (index+1) != @variables[header][:row]
+          add_column_warning(display_index, "The variable '#{@file.headers[index]}' (#{display_index.ordinalize} column) is the #{(@variables[header][:variable_num]).ordinalize} variable in the data dictionary.  It's recommended to have variables in the same order.") if (index+1) != @variables[header][:variable_num]
         end
       end
 

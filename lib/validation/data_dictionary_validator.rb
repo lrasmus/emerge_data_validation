@@ -118,7 +118,7 @@ module EMERGE
             display_index = row_index + 1
             add_row_error(display_index, "'#{row[0]}' (#{display_index.ordinalize} row) appears to be a duplicate of the variable '#{@variables[row[0].upcase][:original_name]}' (#{@variables[row[0].upcase][:row].ordinalize} row).")
           else
-            @variables[variable_name] = {:values => nil, :row => (row_index + 1), :original_name => row[0], :normalized_type => nil}
+            @variables[variable_name] = {:values => nil, :row => (row_index + 1), :original_name => row[0], :normalized_type => nil, :variable_num => (@variables.length + 1) }
           end
         end
       end
