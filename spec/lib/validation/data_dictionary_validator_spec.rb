@@ -3,7 +3,7 @@ require 'validation/data_dictionary_validator'
 
 describe EMERGE::Phenotype::DataDictionaryValidator do
   it "flags in error a file with only one row" do
-    process_with_expected_file_error("VARNAME,VARDESC,TYPE,REPEATED MEASURE,REQUIRED\r\n", "No rows containing data could be found")
+    process_with_expected_file_error("VARNAME,VARDESC,TYPE,REPEATED MEASURE,REQUIRED\r\n", "No valid rows containing data could be found")
   end
 
   it "flags in error a file missing the varname column" do
@@ -29,22 +29,22 @@ describe EMERGE::Phenotype::DataDictionaryValidator do
     validator = EMERGE::Phenotype::DataDictionaryValidator.new(content, :csv)
     results = validator.validate
     puts results[:errors][:rows] unless results[:errors][:rows].length == 0
-    results[:errors][:rows].length.should == 0
+    expect(results[:errors][:rows].length).to eq 0
     puts results[:warnings][:rows] unless results[:warnings][:rows].length == 0
-    results[:warnings][:rows].length.should == 0
+    expect(results[:warnings][:rows].length).to eq 0
   end
 
   it "stores details for each variable" do
     validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
 Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,Integer,Units,3,5,RESOLUTION,No,Yes,COMMENT1,COMMENT2,TMP=Test;TMP2=15", :csv)
     results = validation.validate
-    results[:errors][:rows].length.should eql 0
-    validation.variables["VALID_VARIABLE"][:row].should eql 1
-    validation.variables["VALID_VARIABLE"][:original_name].should eql "Valid_Variable"
-    validation.variables["VALID_VARIABLE"][:values].length.should eql 2
-    validation.variables["VALID_VARIABLE"][:normalized_type].should eql :integer
-    validation.variables["VALID_VARIABLE"][:min_value].should eql 3
-    validation.variables["VALID_VARIABLE"][:max_value].should eql 5
+    expect(results[:errors][:rows].length).to eql 0
+    expect(validation.variables["VALID_VARIABLE"][:row]).to eql 1
+    expect(validation.variables["VALID_VARIABLE"][:original_name]).to eql "Valid_Variable"
+    expect(validation.variables["VALID_VARIABLE"][:values].length).to eql 2
+    expect(validation.variables["VALID_VARIABLE"][:normalized_type]).to eql :integer
+    expect(validation.variables["VALID_VARIABLE"][:min_value]).to eql 3
+    expect(validation.variables["VALID_VARIABLE"][:max_value]).to eql 5
   end
 
   describe "flags in error rows that don't validate" do
@@ -115,6 +115,36 @@ Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No
       "The optional variable 'Valid_Variable' (1st row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.", 1)
   end
 
+  it "counts blank rows in the list of errors" do
+    process_with_expected_row_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=1
+,,,,,,,,,,,,,,
+Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=2",
+      "'Valid_Variable' (3rd row) appears to be a duplicate of the variable 'valid_variable' (1st row).", 3)
+  end
+
+  it "skips empty rows when storing variables" do
+    validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=1
+,,,,,,,,,,,,,,
+Other_Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=2", :csv)
+    validation.validate
+    expect(validation.variables.length).to eq 2
+    expect(validation.variables['OTHER_VALID_VARIABLE'][:row]).to eq 3
+    expect(validation.variables['OTHER_VALID_VARIABLE'][:variable_num]).to eq 2
+  end
+
+  it "skips blank rows when storing variables" do
+    validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=1
+ 
+Other_Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=2", :csv)
+    validation.validate
+    expect(validation.variables.length).to eq 2
+    expect(validation.variables['OTHER_VALID_VARIABLE'][:row]).to eq 3
+    expect(validation.variables['OTHER_VALID_VARIABLE'][:variable_num]).to eq 2
+  end
+
   def process_with_expected_file_warning data, expected_warning
     process_with_expected_warning data, expected_warning, :file, nil
   end
@@ -130,15 +160,15 @@ Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No
   def process_with_expected_warning data, expected_warning, collection, index
     validation = EMERGE::Phenotype::DataDictionaryValidator.new(data, :csv).validate
     puts validation[:errors][collection] unless validation[:errors][collection].length == 0
-    validation[:errors][collection].length.should == 0
-    validation[:warnings][collection].length.should be > 0
+    expect(validation[:errors][collection].length).to eq 0
+    expect(validation[:warnings][collection].length).to be > 0
     if index.nil?
       result = validation[:warnings][collection].include?(expected_warning)
     else
       result = validation[:warnings][collection][index].include?(expected_warning)
     end
     puts validation[:warnings][collection] unless result
-    result.should be_true
+    expect(result).to be true
   end
 
   def process_with_expected_file_error data, expected_error
@@ -155,13 +185,13 @@ Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,No
 
   def process_with_expected_error data, expected_error, collection, index
     validation = EMERGE::Phenotype::DataDictionaryValidator.new(data, :csv).validate
-    validation[:errors][collection].length.should be > 0
+    expect(validation[:errors][collection].length).to be > 0
     if index.nil?
       result = validation[:errors][collection].include?(expected_error)
     else
       result = validation[:errors][collection][index].include?(expected_error)
     end
     puts validation[:errors][collection] unless result
-    result.should be_true
+    expect(result).to be true
   end
 end

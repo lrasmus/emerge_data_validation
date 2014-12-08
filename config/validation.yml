@@ -1,0 +1,11 @@
+defaults: &defaults
+  error_limit: 50
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults

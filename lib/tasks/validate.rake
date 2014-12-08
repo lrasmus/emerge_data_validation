@@ -10,14 +10,14 @@ namespace :validate do
   end
 
   desc "Validate a data file"
-  task :data_file => :environment do
-    dd_content, dd_validator = prepare_dictionary_validator ENV["dictionary_file_path"]
+  task :data_file, :dictionary_file_path, :data_file_path do |task, params|
+    dd_content, dd_validator = prepare_dictionary_validator params[:dictionary_file_path]
     dd_results = dd_validator.validate
-    if (dd_results[:errors].length > 0)
+    if (dd_results[:errors][:file].length > 0 || dd_results[:errors][:columns].length > 0 || dd_results[:errors][:rows].length > 0)
       puts "Please correct the following issues with your data dictionary, and then run the validator again"
       puts dd_results
     else
-      df_content, df_validator = prepare_file_validator ENV["data_file_path"], dd_validator.variables
+      df_content, df_validator = prepare_file_validator params[:data_file_path], dd_validator.variables
       puts df_validator.validate
     end
   end

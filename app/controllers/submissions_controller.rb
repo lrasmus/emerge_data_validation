@@ -46,33 +46,9 @@ class SubmissionsController < ApplicationController
   # POST /submissions
   # POST /submissions.json
   def create
-    @submission = Submission.new(params[:submission])
+    @submission = Submission.new(submission_params)
     get_data_from_params(params[:submission][:data_dictionary], params[:submission][:data_file])
-    #data_dictionary = params[:submission][:data_dictionary].read
-    #data_file = params[:submission][:data_file].read unless params[:submission][:data_file].blank?
-
-    #unless data_dictionary.blank?
-    #  dd_processor = EMERGE::Phenotype::DataDictionaryValidator.new data_dictionary, :csv
-    #  @data_dictionary_results = dd_processor.validate
-    #  @data_dictionary_results[:file_name] = params[:submission][:data_dictionary].original_filename
-    #  unless data_file.blank?
-    #    df_processor = EMERGE::Phenotype::DataFileValidator.new data_file, dd_processor.variables, :csv
-    #    @data_file_results = df_processor.validate
-    #    @data_file_results[:file_name] = params[:submission][:data_file].original_filename
-    #  end
-    #end
-
     render "report"
-
-    #respond_to do |format|
-    #  if @submission.save
-    #    format.html { redirect_to @submission, notice: 'Submission was successfully created.' }
-    #    format.json { render json: @submission, status: :created, location: @submission }
-    #  else
-    #    format.html { render action: "new" }
-    #    format.json { render json: @submission.errors, status: :unprocessable_entity }
-    #  end
-    #end
   end
 
   # PUT /submissions/1
@@ -101,5 +77,11 @@ class SubmissionsController < ApplicationController
       format.html { redirect_to submissions_url }
       format.json { head :no_content }
     end
+  end
+
+  private
+
+  def submission_params
+    params.require(:submission).permit(:data_dictionary, :data_file)
   end
 end
