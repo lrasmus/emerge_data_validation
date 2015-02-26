@@ -47,7 +47,8 @@ class SubmissionsController < ApplicationController
   # POST /submissions.json
   def create
     @submission = Submission.new(submission_params)
-    get_data_from_params(params[:submission][:data_dictionary], params[:submission][:data_file])
+    get_data_from_params(params[:submission][:data_dictionary], params[:submission][:data_dictionary].original_filename,
+      params[:submission][:data_file], (params[:submission][:data_file] ? params[:submission][:data_file].original_filename : nil))
     render "report"
   end
 
