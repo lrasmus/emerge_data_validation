@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+<title>class EMERGE::Phenotype::DataFileValidator - Rails Application Documentation</title>
+
+<link type="text/css" media="screen" href="../../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../../index.html">Home</a>
+    <a href="../../table_of_contents.html#classes">Classes</a>
+    <a href="../../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>lib/validation/data_file_validator.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link"><a href="BaseValidator.html">EMERGE::Phenotype::BaseValidator</a>
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-new">::new</a>
+    
+    <li><a href="#method-i-check_encoded_values">#check_encoded_values</a>
+    
+    <li><a href="#method-i-check_missing_data">#check_missing_data</a>
+    
+    <li><a href="#method-i-check_numeric_ranges">#check_numeric_ranges</a>
+    
+    <li><a href="#method-i-check_variable_order">#check_variable_order</a>
+    
+    <li><a href="#method-i-check_variables_used">#check_variables_used</a>
+    
+    <li><a href="#method-i-format_list_of_values_for_error">#format_list_of_values_for_error</a>
+    
+    <li><a href="#method-i-validate">#validate</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="../../doc/README_FOR_APP.html">README_FOR_APP</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../../EMERGE.html">EMERGE</a>
+  
+    <li><a href="../../EMERGE/Phenotype.html">EMERGE::Phenotype</a>
+  
+    <li><a href="../../EMERGE/Phenotype/BaseValidator.html">EMERGE::Phenotype::BaseValidator</a>
+  
+    <li><a href="../../EMERGE/Phenotype/DataDictionaryValidator.html">EMERGE::Phenotype::DataDictionaryValidator</a>
+  
+    <li><a href="../../EMERGE/Phenotype/DataFileValidator.html">EMERGE::Phenotype::DataFileValidator</a>
+  
+    <li><a href="../../EMERGE/Phenotype/FileProcessor.html">EMERGE::Phenotype::FileProcessor</a>
+  
+    <li><a href="../../Api.html">Api</a>
+  
+    <li><a href="../../Api/V1.html">Api::V1</a>
+  
+    <li><a href="../../Api/V1/ApiController.html">Api::V1::ApiController</a>
+  
+    <li><a href="../../Api/V1/SubmissionsController.html">Api::V1::SubmissionsController</a>
+  
+    <li><a href="../../ApplicationController.html">ApplicationController</a>
+  
+    <li><a href="../../ApplicationHelper.html">ApplicationHelper</a>
+  
+    <li><a href="../../Submission.html">Submission</a>
+  
+    <li><a href="../../SubmissionsController.html">SubmissionsController</a>
+  
+    <li><a href="../../SubmissionsHelper.html">SubmissionsHelper</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class EMERGE::Phenotype::DataFileValidator</h1>
+
+  <div id="description" class="description">
+    
+<p>Performs validation of a data file, according to the pre-defined rules</p>
+<dl class="rdoc-list note-list"><dt>Author
+<dd>
+<p>Luke Rasmussen (<a
+href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a>)</p>
+</dd></dl>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">(data, variables, delimiter = :csv)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File lib/validation/data_file_validator.rb, line 10</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">data</span>, <span class="ruby-identifier">variables</span>, <span class="ruby-identifier">delimiter</span> = <span class="ruby-value">:csv</span>)
+  <span class="ruby-ivar">@variables</span> = <span class="ruby-identifier">variables</span>
+  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">data</span>, <span class="ruby-value">:data_file</span>, <span class="ruby-identifier">delimiter</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-check_encoded_values" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">check_encoded_values</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="check_encoded_values-source">
+            <pre><span class="ruby-comment"># File lib/validation/data_file_validator.rb, line 88</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_encoded_values</span>
+  <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">data</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span>, <span class="ruby-identifier">row_index</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_blank_row?</span>(<span class="ruby-identifier">row</span>)
+    <span class="ruby-identifier">row</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">field</span>, <span class="ruby-identifier">field_index</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">field</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">nil?</span>
+      <span class="ruby-identifier">variable_name</span> = <span class="ruby-identifier">field</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">upcase</span>
+      <span class="ruby-identifier">variable</span> = <span class="ruby-ivar">@variables</span>[<span class="ruby-identifier">variable_name</span>]
+      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">variable</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">variable</span>[<span class="ruby-value">:normalized_type</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">:encoded</span> <span class="ruby-comment"># Skip if we don't have a list of values to check against, or this isn't an encoded type</span>
+      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">nil?</span>
+      <span class="ruby-identifier">formatted_value</span> = <span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">upcase</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">variable</span>[<span class="ruby-value">:values</span>].<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">formatted_value</span>)
+        <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is not listed in the data dictionary.  #{format_list_of_values_for_error(variable[:original_values])}&quot;</span>)
+      <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-identifier">variable</span>[<span class="ruby-value">:original_values</span>].<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>])
+        <span class="ruby-identifier">correct_val</span> = <span class="ruby-identifier">variable</span>[<span class="ruby-value">:original_values</span>].<span class="ruby-identifier">find</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">val</span><span class="ruby-operator">|</span> <span class="ruby-identifier">val</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">casecmp</span>(<span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>]) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>}
+        <span class="ruby-ivar">@results</span>[<span class="ruby-value">:warnings</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The value '#{field[1]}' for the variable '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is found, but does not match exactly because of capitalization (should be '#{correct_val[0]}').&quot;</span>)
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- check_encoded_values-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- check_encoded_values-method -->
+
+    
+      <div id="method-i-check_missing_data" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">check_missing_data</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="check_missing_data-source">
+            <pre><span class="ruby-comment"># File lib/validation/data_file_validator.rb, line 50</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_missing_data</span>
+  <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">data</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span>, <span class="ruby-identifier">row_index</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_blank_row?</span>(<span class="ruby-identifier">row</span>)
+    <span class="ruby-identifier">row</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">field</span>, <span class="ruby-identifier">field_index</span><span class="ruby-operator">|</span>
+      <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;A value for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is blank, however it is best practice to provide a value to explicitly define missing data.&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">blank?</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- check_missing_data-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- check_missing_data-method -->
+
+    
+      <div id="method-i-check_numeric_ranges" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">check_numeric_ranges</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="check_numeric_ranges-source">
+            <pre><span class="ruby-comment"># File lib/validation/data_file_validator.rb, line 59</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_numeric_ranges</span>
+  <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">data</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span>, <span class="ruby-identifier">row_index</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_blank_row?</span>(<span class="ruby-identifier">row</span>)
+    <span class="ruby-identifier">row</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">field</span>, <span class="ruby-identifier">field_index</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">field</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">nil?</span>
+      <span class="ruby-identifier">variable_name</span> = <span class="ruby-identifier">field</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">upcase</span>
+      <span class="ruby-identifier">variable</span> = <span class="ruby-ivar">@variables</span>[<span class="ruby-identifier">variable_name</span>]
+      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">variable</span>.<span class="ruby-identifier">nil?</span>
+      <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">variable</span>[<span class="ruby-value">:normalized_type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:integer</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">variable</span>[<span class="ruby-value">:normalized_type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:decimal</span>
+      <span class="ruby-identifier">value</span> = <span class="ruby-identifier">convert_string_to_number</span>(<span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>], <span class="ruby-identifier">variable</span>[<span class="ruby-value">:normalized_type</span>])
+      <span class="ruby-keyword">if</span> (<span class="ruby-identifier">variable</span>[<span class="ruby-value">:normalized_type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:integer</span>)
+        <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">variable</span>[<span class="ruby-value">:values</span>].<span class="ruby-identifier">blank?</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">variable</span>[<span class="ruby-value">:values</span>].<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>])
+        <span class="ruby-keyword">if</span> <span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\./</span>
+          <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) should be an integer, not a decimal.&quot;</span>)
+        <span class="ruby-keyword">elsif</span> (<span class="ruby-regexp">/[\D]+/</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">field</span>[<span class="ruby-value">1</span>])
+          <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The value '#{field[1]}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) should be an integer, but appears to have non-numeric characters.&quot;</span>)
+        <span class="ruby-keyword">end</span>
+      <span class="ruby-keyword">end</span>
+
+      <span class="ruby-comment"># We only perform the check if both min and max are specified.  They are required in conjunction.</span>
+      <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">variable</span>[<span class="ruby-value">:min_value</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">variable</span>[<span class="ruby-value">:max_value</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">nil?</span>)
+        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">value</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">variable</span>[<span class="ruby-value">:min_value</span>] <span class="ruby-keyword">or</span> <span class="ruby-identifier">value</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">variable</span>[<span class="ruby-value">:max_value</span>])
+          <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The value '#{value}' for '#{@file.headers[field_index]}' (#{(row_index+1).ordinalize} row) is outside of the range defined in the data dictionary (#{variable[:min_value]} to #{variable[:max_value]}).&quot;</span>)
+        <span class="ruby-keyword">end</span>
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- check_numeric_ranges-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- check_numeric_ranges-method -->
+
+    
+      <div id="method-i-check_variable_order" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">check_variable_order</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="check_variable_order-source">
+            <pre><span class="ruby-comment"># File lib/validation/data_file_validator.rb, line 42</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_variable_order</span>
+  <span class="ruby-identifier">formatted_headers</span> = <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">blank?</span> <span class="ruby-operator">?</span> <span class="ruby-string">&quot;&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">upcase</span>}
+  <span class="ruby-identifier">formatted_headers</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">header</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@variables</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">header</span>)
+    <span class="ruby-ivar">@results</span>[<span class="ruby-value">:warnings</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The variable '#{@file.headers[index]}' (#{(index+1).ordinalize} column) is the #{(@variables[header][:row]).ordinalize} variable in the data dictionary.  It's recommended to have variables in the same order.&quot;</span>) <span class="ruby-keyword">if</span> (<span class="ruby-identifier">index</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>) <span class="ruby-operator">!=</span> <span class="ruby-ivar">@variables</span>[<span class="ruby-identifier">header</span>][<span class="ruby-value">:row</span>]
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- check_variable_order-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- check_variable_order-method -->
+
+    
+      <div id="method-i-check_variables_used" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">check_variables_used</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="check_variables_used-source">
+            <pre><span class="ruby-comment"># File lib/validation/data_file_validator.rb, line 27</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_variables_used</span>
+  <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">header</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">header</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">header</span>.<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">blank?</span>
+      <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The #{(index + 1).ordinalize} column has a blank header - please set the header and define it in the data dictionary.&quot;</span>)
+    <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@variables</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">header</span>.<span class="ruby-identifier">upcase</span>)
+      <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The variable '#{header}' (#{(index + 1).ordinalize} column) is not defined in the data dictionary.&quot;</span>)
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">formatted_headers</span> = <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">blank?</span> <span class="ruby-operator">?</span> <span class="ruby-string">&quot;&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">upcase</span>}
+  <span class="ruby-ivar">@variables</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">variable</span><span class="ruby-operator">|</span>
+    <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The variable '#{@variables[variable][:original_name]}' is defined in the data dictionary, but does not appear in the data file.&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">formatted_headers</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">variable</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- check_variables_used-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- check_variables_used-method -->
+
+    
+      <div id="method-i-format_list_of_values_for_error" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">format_list_of_values_for_error</span><span
+            class="method-args">(values)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="format_list_of_values_for_error-source">
+            <pre><span class="ruby-comment"># File lib/validation/data_file_validator.rb, line 108</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">format_list_of_values_for_error</span> <span class="ruby-identifier">values</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">6</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-node">&quot;It should be one of the following: #{values.keys.join(', ')}&quot;</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-string">&quot;&quot;</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- format_list_of_values_for_error-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- format_list_of_values_for_error-method -->
+
+    
+      <div id="method-i-validate" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">validate</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="validate-source">
+            <pre><span class="ruby-comment"># File lib/validation/data_file_validator.rb, line 15</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>
+  <span class="ruby-comment"># Start by performing checks that would prevent us from doing any additional processing.</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@results</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">rows_exist?</span>
+  <span class="ruby-identifier">identify_blank_rows</span>
+  <span class="ruby-identifier">check_variables_used</span>
+  <span class="ruby-identifier">check_variable_order</span>
+  <span class="ruby-identifier">check_missing_data</span>
+  <span class="ruby-identifier">check_numeric_ranges</span>
+  <span class="ruby-identifier">check_encoded_values</span>
+  <span class="ruby-ivar">@results</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- validate-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- validate-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.2.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

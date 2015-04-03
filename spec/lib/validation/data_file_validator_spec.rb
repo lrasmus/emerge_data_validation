@@ -3,8 +3,8 @@ require 'validation/data_file_validator'
 
 describe EMERGE::Phenotype::DataFileValidator do
   VARIABLES = {
-    "SUBJID" => {:values => nil, :row => 1, :original_name => "SUBJID", :normalized_type => :string},
-    "DIAGNOSIS" => {:values => nil, :row => 2, :original_name => "Diagnosis", :normalized_type => :string}
+    "SUBJID" => {:values => nil, :row => 1, :original_name => "SUBJID", :normalized_type => :string, :variable_num => 1},
+    "DIAGNOSIS" => {:values => nil, :row => 2, :original_name => "Diagnosis", :normalized_type => :string, :variable_num => 2}
   }
 
   it "flags in error a file with only one row" do

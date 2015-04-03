@@ -3,7 +3,9 @@ EmergeDataValidation::Application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :submissions, :only => [:index, :create]
+      resources :submissions, :only => [:index, :create] do
+        post :create_local, :on => :collection
+      end
     end
   end
 
