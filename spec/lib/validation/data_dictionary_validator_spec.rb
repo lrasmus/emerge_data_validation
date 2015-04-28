@@ -47,6 +47,16 @@ Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,Integer,Units,3,5,RESOLUTION,No,
     expect(validation.variables["VALID_VARIABLE"][:max_value]).to eql 5
   end
 
+  it "allows whitespace in variable value list" do
+    validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,Yes,COMMENT1,COMMENT2,TMP = Test val; TMP2 = 15 ", :csv)
+    results = validation.validate
+    expect(results[:errors][:rows].length).to eql 0
+    expect(validation.variables["VALID_VARIABLE"][:values].length).to eql 2
+    expect(validation.variables["VALID_VARIABLE"][:values]["TMP"]). to eql "Test val"
+    expect(validation.variables["VALID_VARIABLE"][:values]["TMP2"]). to eql "15"
+  end
+
   describe "flags in error rows that don't validate" do
     it "VARNAME with spaces" do
       process_with_expected_row_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES,

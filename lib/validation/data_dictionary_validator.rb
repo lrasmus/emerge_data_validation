@@ -124,7 +124,7 @@ module EMERGE
       end
 
       def check_values_column_position
-        # If the VALUES column is present (it isn't required), it must be the last non-blank column.  This is because the way data ditionaries
+        # If the VALUES column is present (it isn't required), it must be the last non-blank column.  This is because the way data dictionaries
         # are created & exported to CSV by Excel, we'll see columns like "VALUES,,,,,"
         found_index = @file.headers.index("VALUES")
         @values_column_valid = !found_index.nil?
@@ -169,7 +169,7 @@ module EMERGE
           unless values.blank?
             values.each_with_index do |value, var_index|
               value ||= ""
-              value_parts = value.split('=')
+              value_parts = value.split('=').each{|v| v.strip! }
               add_row_error(display_index, "Value '#{value}' for variable '#{variable}' (#{display_index.ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
               found_item = unique_values[value_parts[0].upcase]
               if (found_item.nil?)
