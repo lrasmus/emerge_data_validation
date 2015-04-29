@@ -153,6 +153,17 @@ module EMERGE
         end
       end
 
+      # Our recommendation is to only allow ad-hoc values when they are not tied to a source vocabulary, since
+      # they essentially are non-standard values.  This checks if a source vocabulary is specified, and if not
+      # will allow ad-hoc values for this variable.
+      def allow_ad_hoc_values(row, row_index)
+        source_column_index = @file.headers.index("SOURCE")
+        source_id_column_index = @file.headers.index("SOURCE ID")
+        source = row.fields[source_column_index]
+        source_id = row.fields[source_id_column_index]
+        return ((source.nil? or source.blank?) and (source_id.nil? or source_id.blank?))
+      end
+
       def check_values_in_row(row, row_index)
         return unless @values_column_valid
         values_column_index = @file.headers.index("VALUES")
@@ -162,15 +173,23 @@ module EMERGE
           original_values = Hash.new
           variable = row[0]
           variable_key = variable.upcase
-          values = row.fields[values_column_index].split(';') unless row.fields[values_column_index].nil?
+          is_ad_hoc_allowed = allow_ad_hoc_values(row, row_index)
+          unless row.fields[values_column_index].nil?
+            values = row.fields[values_column_index].split(';')
+            is_ad_hoc = !row.fields[values_column_index].include?('=')  # Ad hoc values are in the form Low;Med;High instead of 1=Low;2=Med;3=High
+          end
           is_required = !(/Yes/i.match(row[required_column_index]).nil?)
           missing_na_value_found = false
+          missing_ad_hoc_na_value_found = false
           display_index = row_index + 1
           unless values.blank?
             values.each_with_index do |value, var_index|
               value ||= ""
-              value_parts = value.split('=').each{|v| v.strip! }
-              add_row_error(display_index, "Value '#{value}' for variable '#{variable}' (#{display_index.ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'") unless value_parts.length == 2
+              value_parts = value.split('=').each{|v| v.strip! }  # Remove whitespace around code and description
+              if (!is_ad_hoc && value_parts.length != 2) or (is_ad_hoc && value_parts.length !=1) or (is_ad_hoc and !is_ad_hoc_allowed)
+                add_row_error(display_index, "Value '#{value}' for variable '#{variable}' (#{display_index.ordinalize} row) is invalid.  We are expecting something that looks like 'val=Description'")
+              end
+
               found_item = unique_values[value_parts[0].upcase]
               if (found_item.nil?)
                 unique_values[value_parts[0].upcase] = value_parts[1]
@@ -180,17 +199,24 @@ module EMERGE
               end
 
               missing_na_value_found = !(/.*missing.*|not applicable|NA|not assessed/i.match(value_parts[1]).nil?) unless is_required or missing_na_value_found
+              missing_ad_hoc_na_value_found = !(/\.|NA/i.match(value_parts[0]).nil?) unless is_required or missing_ad_hoc_na_value_found
             end
           end
 
           unless @variables[variable_key].nil?
             @variables[variable_key][:values] = unique_values
             @variables[variable_key][:original_values] = original_values
+            @variables[variable_key][:ad_hoc_values] = is_ad_hoc
           end
 
           # Variables that are not required must define a missing or not applicable value
-          if !is_required and !missing_na_value_found
-            add_row_error(display_index, "The optional variable '#{variable}' (#{display_index.ordinalize} row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.")
+          if !is_required
+            # We provide additional guidance for ad-hoc variables in defining missing/NA values
+            if is_ad_hoc and !missing_ad_hoc_na_value_found
+              add_row_error(display_index, "The optional variable '#{variable}' (#{display_index.ordinalize} row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.  For ad-hoc value lists, it is recommended to use '.' for missing and 'NA' for not applicable.")
+            elsif !is_ad_hoc and !missing_na_value_found
+              add_row_error(display_index, "The optional variable '#{variable}' (#{display_index.ordinalize} row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.")
+            end
           end
         end
       end

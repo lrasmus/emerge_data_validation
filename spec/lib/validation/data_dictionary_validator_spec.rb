@@ -41,20 +41,58 @@ Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,Integer,Units,3,5,RESOLUTION,No,
     expect(results[:errors][:rows].length).to eql 0
     expect(validation.variables["VALID_VARIABLE"][:row]).to eql 1
     expect(validation.variables["VALID_VARIABLE"][:original_name]).to eql "Valid_Variable"
+    expect(validation.variables["VALID_VARIABLE"][:ad_hoc_values]).to eql false
     expect(validation.variables["VALID_VARIABLE"][:values].length).to eql 2
     expect(validation.variables["VALID_VARIABLE"][:normalized_type]).to eql :integer
     expect(validation.variables["VALID_VARIABLE"][:min_value]).to eql 3
     expect(validation.variables["VALID_VARIABLE"][:max_value]).to eql 5
   end
 
-  it "allows whitespace in variable value list" do
-    validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+  describe "value lists" do
+    it "allows whitespace" do
+      validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
 Valid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,Yes,COMMENT1,COMMENT2,TMP = Test val; TMP2 = 15 ", :csv)
-    results = validation.validate
-    expect(results[:errors][:rows].length).to eql 0
-    expect(validation.variables["VALID_VARIABLE"][:values].length).to eql 2
-    expect(validation.variables["VALID_VARIABLE"][:values]["TMP"]). to eql "Test val"
-    expect(validation.variables["VALID_VARIABLE"][:values]["TMP2"]). to eql "15"
+      results = validation.validate
+      expect(results[:errors][:rows].length).to eql 0
+      expect(validation.variables["VALID_VARIABLE"][:values].length).to eql 2
+      expect(validation.variables["VALID_VARIABLE"][:ad_hoc_values]).to eql false
+      expect(validation.variables["VALID_VARIABLE"][:values]["TMP"]).to eql "Test val"
+      expect(validation.variables["VALID_VARIABLE"][:values]["TMP2"]).to eql "15"
+    end
+
+    it "supports ad-hoc values" do
+      validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+Valid_Variable,VARDESC,,,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,Yes,COMMENT1,COMMENT2,Low;Med;High", :csv)
+      results = validation.validate
+      expect(results[:errors][:rows].length).to eql 0
+      expect(validation.variables["VALID_VARIABLE"][:values].length).to eql 3
+      expect(validation.variables["VALID_VARIABLE"][:ad_hoc_values]).to eql true
+      expect(validation.variables["VALID_VARIABLE"][:values]["Low"]).to be_nil
+      expect(validation.variables["VALID_VARIABLE"][:values]["Med"]).to be_nil
+      expect(validation.variables["VALID_VARIABLE"][:values]["High"]).to be_nil
+    end
+
+    it "supports optional ad-hoc values" do
+      validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+Valid_Variable,VARDESC,,,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,No,COMMENT1,COMMENT2,Low;Med;High;.", :csv)
+      results = validation.validate
+      expect(results[:errors][:rows].length).to eql 0
+      expect(validation.variables["VALID_VARIABLE"][:values].length).to eql 4
+      expect(validation.variables["VALID_VARIABLE"][:ad_hoc_values]).to eql true
+      expect(validation.variables["VALID_VARIABLE"][:values]["."]).to be_nil
+    end
+
+    it "flags an error when optional ad-hoc values don't specify NA or missing options" do
+      process_with_expected_row_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+Invalid_Variable,VARDESC,,,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,No,COMMENT1,COMMENT2,Low;Med;High",
+      "The optional variable 'Invalid_Variable' (1st row) doesn't appear to have a 'Missing' or 'Not Applicable' value listed, and should be added.  For ad-hoc value lists, it is recommended to use '.' for missing and 'NA' for not applicable.", 1)
+    end
+
+    it "flags an error when ad-hoc values are used and a source vocab is specified" do
+      process_with_expected_row_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+Invalid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,Yes,COMMENT1,COMMENT2,Low;Med;High",
+      "Value 'Low' for variable 'Invalid_Variable' (1st row) is invalid.  We are expecting something that looks like 'val=Description'", 1)
+    end
   end
 
   describe "flags in error rows that don't validate" do
