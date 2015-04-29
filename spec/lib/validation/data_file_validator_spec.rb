@@ -113,6 +113,25 @@ describe EMERGE::Phenotype::DataFileValidator do
       variables, 1)
   end
 
+  it "flags in error ad-hoc encoded fields that have an unknown value" do
+    variables = VARIABLES.clone
+    variables["DIAGNOSIS"][:normalized_type] = :encoded
+    variables["DIAGNOSIS"][:values] = { "TEST1" => nil, "TEST2" => nil }
+    variables["DIAGNOSIS"][:original_values] = { "Test1" => nil, "Test2" => nil }
+    process_with_expected_row_error("SUBJID,Diagnosis\r\n1,TEST3",
+      "The value 'TEST3' for the variable 'Diagnosis' (1st row) is not listed in the data dictionary.  It should be one of the following: Test1, Test2",
+      variables, 1)
+  end
+
+  it "supports ad-hoc values for encoded fields" do
+    variables = VARIABLES.clone
+    variables["DIAGNOSIS"][:normalized_type] = :encoded
+    variables["DIAGNOSIS"][:ad_hoc_values] = true
+    variables["DIAGNOSIS"][:values] = { "TEST1" => nil, "TEST2" => nil }
+    variables["DIAGNOSIS"][:original_values] = { "Test1" => nil, "Test2" => nil }
+    process_with_expected_success("SUBJID,Diagnosis\r\n1,Test1\r\n2,Test2", variables)
+  end
+
   it "flags with a warning encoded fields that have a known value but mismatched case" do
     variables = VARIABLES.clone
     variables["DIAGNOSIS"][:normalized_type] = :encoded
