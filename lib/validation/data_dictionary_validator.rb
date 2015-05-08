@@ -159,8 +159,8 @@ module EMERGE
       def allow_ad_hoc_values(row, row_index)
         source_column_index = @file.headers.index("SOURCE")
         source_id_column_index = @file.headers.index("SOURCE ID")
-        source = row.fields[source_column_index]
-        source_id = row.fields[source_id_column_index]
+        source = row.fields[source_column_index] unless source_column_index.nil?
+        source_id = row.fields[source_id_column_index] unless source_id_column_index.nil?
         return ((source.nil? or source.blank?) and (source_id.nil? or source_id.blank?))
       end
 
