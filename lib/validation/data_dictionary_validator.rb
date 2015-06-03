@@ -112,7 +112,7 @@ module EMERGE
       end
 
       def check_unique_variable_in_row(row, row_index)
-        unless is_blank_row?(row)
+        unless is_blank_row?(row) or row[0].nil?
           variable_name = row[0].upcase
           if @variables.has_key?(variable_name)
             display_index = row_index + 1
@@ -226,7 +226,7 @@ module EMERGE
         return if type_index.nil?
         min_index = @file.headers.index("MIN")
         max_index = @file.headers.index("MAX")
-        unless is_blank_row?(row)
+        unless is_blank_row?(row) or row[0].nil?
           variable_key = row[0].upcase
           normalized_type = get_normalized_type(row[type_index])
           @variables[variable_key][:normalized_type] = normalized_type
