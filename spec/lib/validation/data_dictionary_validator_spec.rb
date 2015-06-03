@@ -129,6 +129,11 @@ valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,Decimal,Units,3,,RESOLUTION,No,N
       "'valid_variable' (1st row) is missing a maximum value - this is required for variables of type 'Decimal'", 1)
   end
 
+  it "handles rows without a variable name" do
+    process_with_expected_row_error("TABLENAME,VARNAME,VARDESC,RAW VALUE,FORMATTED VALUE,DOCFILE,SOURCE,SOURCEID,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,ORDER
+,,,27,Test,,,,,,,,,,,,,", "'' (1st row), column 'VARNAME' (value = '') is invalid: Variable names should not contain spaces (including at the beginning or end of the variable name)", 1)
+  end
+
   it "flags in error duplicate variables" do
     process_with_expected_row_error("VARNAME,VARDESC,SOURCE,SOURCE ID,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
 valid_variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,String,Units,3,,RESOLUTION,No,Yes,COMMENT1,COMMENT2,VALUE=1
