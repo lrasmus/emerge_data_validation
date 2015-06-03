@@ -93,6 +93,13 @@ Invalid_Variable,VARDESC,,,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,N
 Invalid_Variable,VARDESC,SOURCE,SOURCE ID,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,Yes,COMMENT1,COMMENT2,Low;Med;High",
       "Value 'Low' for variable 'Invalid_Variable' (1st row) is invalid.  We are expecting something that looks like 'val=Description'", 1)
     end
+
+    it "does not error out checking for ad-hoc values when source columns are missing" do
+      validation = EMERGE::Phenotype::DataDictionaryValidator.new("VARNAME,VARDESC,DOCFILE,TYPE,UNITS,MIN,MAX,RESOLUTION,REPEATED MEASURE,REQUIRED,COMMENT1,COMMENT2,VALUES
+Valid_Variable,VARDESC,,,DOCFILE,\"String, Encoded\",Units,3,5,RESOLUTION,No,No,COMMENT1,COMMENT2,Low;Med;High;.", :csv)
+      results = validation.validate
+      expect(results[:errors][:rows].length).to eql 0
+    end
   end
 
   describe "flags in error rows that don't validate" do
