@@ -1,268 +1,270 @@
 <!DOCTYPE html>
 
 <html>
+
 <head>
-<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>class EMERGE::Phenotype::DataDictionaryValidator - Rails Application Documentation</title>
+  <title>class EMERGE::Phenotype::DataDictionaryValidator - Rails Application Documentation</title>
 
-<link type="text/css" media="screen" href="../../rdoc.css" rel="stylesheet">
+  <link type="text/css" media="screen" href="../../rdoc.css" rel="stylesheet">
 
-<script type="text/javascript">
-  var rdoc_rel_prefix = "../../";
-</script>
+  <script type="text/javascript">
+    var rdoc_rel_prefix = "../../";
+  </script>
 
-<script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
-<script type="text/javascript" charset="utf-8" src="../../js/navigation.js"></script>
-<script type="text/javascript" charset="utf-8" src="../../js/search_index.js"></script>
-<script type="text/javascript" charset="utf-8" src="../../js/search.js"></script>
-<script type="text/javascript" charset="utf-8" src="../../js/searcher.js"></script>
-<script type="text/javascript" charset="utf-8" src="../../js/darkfish.js"></script>
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+  <script type="text/javascript" charset="utf-8" src="../../js/navigation.js"></script>
+  <script type="text/javascript" charset="utf-8" src="../../js/search_index.js"></script>
+  <script type="text/javascript" charset="utf-8" src="../../js/search.js"></script>
+  <script type="text/javascript" charset="utf-8" src="../../js/searcher.js"></script>
+  <script type="text/javascript" charset="utf-8" src="../../js/darkfish.js"></script>
 
 
 <body id="top" class="class">
-<nav id="metadata">
-  <nav id="home-section" class="section">
-  <h3 class="section-header">
-    <a href="../../index.html">Home</a>
-    <a href="../../table_of_contents.html#classes">Classes</a>
-    <a href="../../table_of_contents.html#methods">Methods</a>
-  </h3>
-</nav>
+  <nav id="metadata">
+    <nav id="home-section" class="section">
+      <h3 class="section-header">
+        <a href="../../index.html">Home</a>
+        <a href="../../table_of_contents.html#classes">Classes</a>
+        <a href="../../table_of_contents.html#methods">Methods</a>
+      </h3>
+    </nav>
 
 
-  <nav id="search-section" class="section project-section" class="initially-hidden">
-  <form action="#" method="get" accept-charset="utf-8">
-    <h3 class="section-header">
-      <input type="text" name="search" placeholder="Search" id="search-field"
-             title="Type to search, Up and Down to navigate, Enter to load">
-    </h3>
-  </form>
+    <nav id="search-section" class="section project-section" class="initially-hidden">
+      <form action="#" method="get" accept-charset="utf-8">
+        <h3 class="section-header">
+          <input type="text" name="search" placeholder="Search" id="search-field"
+            title="Type to search, Up and Down to navigate, Enter to load">
+        </h3>
+      </form>
 
-  <ul id="search-results" class="initially-hidden"></ul>
-</nav>
+      <ul id="search-results" class="initially-hidden"></ul>
+    </nav>
 
 
-  <div id="file-metadata">
-    <nav id="file-list-section" class="section">
-  <h3 class="section-header">Defined In</h3>
-  <ul>
-    <li>lib/validation/data_dictionary_validator.rb
-  </ul>
-</nav>
+    <div id="file-metadata">
+      <nav id="file-list-section" class="section">
+        <h3 class="section-header">Defined In</h3>
+        <ul>
+          <li>lib/validation/data_dictionary_validator.rb
+        </ul>
+      </nav>
 
-    
-  </div>
 
-  <div id="class-metadata">
-    
-    <nav id="parent-class-section" class="section">
-  <h3 class="section-header">Parent</h3>
-  
-  <p class="link"><a href="BaseValidator.html">EMERGE::Phenotype::BaseValidator</a>
-  
-</nav>
+    </div>
 
-    
-    <!-- Method Quickref -->
-<nav id="method-list-section" class="section">
-  <h3 class="section-header">Methods</h3>
+    <div id="class-metadata">
 
-  <ul class="link-list">
-    
-    <li><a href="#method-c-new">::new</a>
-    
-    <li><a href="#method-i-check_constraints_for_types">#check_constraints_for_types</a>
-    
-    <li><a href="#method-i-check_header_columns">#check_header_columns</a>
-    
-    <li><a href="#method-i-check_required_columns">#check_required_columns</a>
-    
-    <li><a href="#method-i-check_unique_variables">#check_unique_variables</a>
-    
-    <li><a href="#method-i-check_values">#check_values</a>
-    
-    <li><a href="#method-i-check_values_column_position">#check_values_column_position</a>
-    
-    <li><a href="#method-i-set_variable_constraints">#set_variable_constraints</a>
-    
-    <li><a href="#method-i-validate">#validate</a>
-    
-    <li><a href="#method-i-validate_rows">#validate_rows</a>
-    
-    <li><a href="#method-i-variable_name_column_exists-3F">#variable_name_column_exists?</a>
-    
-    <li><a href="#method-i-variables">#variables</a>
-    
-  </ul>
-</nav>
+      <nav id="parent-class-section" class="section">
+        <h3 class="section-header">Parent</h3>
 
-  </div>
+        <p class="link"><a href="BaseValidator.html">EMERGE::Phenotype::BaseValidator</a>
 
-  <div id="project-metadata">
-    <nav id="fileindex-section" class="section project-section">
-  <h3 class="section-header">Pages</h3>
+      </nav>
 
-  <ul>
-  
-    <li class="file"><a href="../../doc/README_FOR_APP.html">README_FOR_APP</a>
-  
-  </ul>
-</nav>
 
-    <nav id="classindex-section" class="section project-section">
-  <h3 class="section-header">Class and Module Index</h3>
+      <!-- Method Quickref -->
+      <nav id="method-list-section" class="section">
+        <h3 class="section-header">Methods</h3>
 
-  <ul class="link-list">
-  
-    <li><a href="../../EMERGE.html">EMERGE</a>
-  
-    <li><a href="../../EMERGE/Phenotype.html">EMERGE::Phenotype</a>
-  
-    <li><a href="../../EMERGE/Phenotype/BaseValidator.html">EMERGE::Phenotype::BaseValidator</a>
-  
-    <li><a href="../../EMERGE/Phenotype/DataDictionaryValidator.html">EMERGE::Phenotype::DataDictionaryValidator</a>
-  
-    <li><a href="../../EMERGE/Phenotype/DataFileValidator.html">EMERGE::Phenotype::DataFileValidator</a>
-  
-    <li><a href="../../EMERGE/Phenotype/FileProcessor.html">EMERGE::Phenotype::FileProcessor</a>
-  
-    <li><a href="../../Api.html">Api</a>
-  
-    <li><a href="../../Api/V1.html">Api::V1</a>
-  
-    <li><a href="../../Api/V1/ApiController.html">Api::V1::ApiController</a>
-  
-    <li><a href="../../Api/V1/SubmissionsController.html">Api::V1::SubmissionsController</a>
-  
-    <li><a href="../../ApplicationController.html">ApplicationController</a>
-  
-    <li><a href="../../ApplicationHelper.html">ApplicationHelper</a>
-  
-    <li><a href="../../Submission.html">Submission</a>
-  
-    <li><a href="../../SubmissionsController.html">SubmissionsController</a>
-  
-    <li><a href="../../SubmissionsHelper.html">SubmissionsHelper</a>
-  
-  </ul>
-</nav>
+        <ul class="link-list">
 
-  </div>
-</nav>
+          <li><a href="#method-c-new">::new</a>
 
-<div id="documentation">
-  <h1 class="class">class EMERGE::Phenotype::DataDictionaryValidator</h1>
+          <li><a href="#method-i-check_constraints_for_types">#check_constraints_for_types</a>
 
-  <div id="description" class="description">
-    
-<p>Performs validation of a data dictionary file, according to the pre-defined
-rules</p>
-<dl class="rdoc-list note-list"><dt>Author
-<dd>
-<p>Luke Rasmussen (<a
-href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a>)</p>
-</dd></dl>
+          <li><a href="#method-i-check_header_columns">#check_header_columns</a>
 
-  </div><!-- description -->
+          <li><a href="#method-i-check_required_columns">#check_required_columns</a>
 
-  
-  
-  
-  <section id="5Buntitled-5D" class="documentation-section">
-    
+          <li><a href="#method-i-check_unique_variables">#check_unique_variables</a>
 
-    
+          <li><a href="#method-i-check_values">#check_values</a>
 
-    
-    <!-- Constants -->
-    <section id="constants-list" class="section">
-      <h3 class="section-header">Constants</h3>
-      <dl>
-      
-        <dt id="COLUMN_VALIDATION_REGEX">COLUMN_VALIDATION_REGEX
-        
-        <dd class="description">
-        
-      
-        <dt id="EXPECTED_COLUMNS">EXPECTED_COLUMNS
-        
-        <dd class="description">
-        
-      
-        <dt id="REQUIRED_DATA_COLUMNS">REQUIRED_DATA_COLUMNS
-        
-        <dd class="description">
-        
-      
+          <li><a href="#method-i-check_values_column_position">#check_values_column_position</a>
+
+          <li><a href="#method-i-set_variable_constraints">#set_variable_constraints</a>
+
+          <li><a href="#method-i-validate">#validate</a>
+
+          <li><a href="#method-i-validate_rows">#validate_rows</a>
+
+          <li><a href="#method-i-variable_name_column_exists-3F">#variable_name_column_exists?</a>
+
+          <li><a href="#method-i-variables">#variables</a>
+
+        </ul>
+      </nav>
+
+    </div>
+
+    <div id="project-metadata">
+      <nav id="fileindex-section" class="section project-section">
+        <h3 class="section-header">Pages</h3>
+
+        <ul>
+
+          <li class="file"><a href="../../doc/README_FOR_APP.html">README_FOR_APP</a>
+
+        </ul>
+      </nav>
+
+      <nav id="classindex-section" class="section project-section">
+        <h3 class="section-header">Class and Module Index</h3>
+
+        <ul class="link-list">
+
+          <li><a href="../../EMERGE.html">EMERGE</a>
+
+          <li><a href="../../EMERGE/Phenotype.html">EMERGE::Phenotype</a>
+
+          <li><a href="../../EMERGE/Phenotype/BaseValidator.html">EMERGE::Phenotype::BaseValidator</a>
+
+          <li><a
+              href="../../EMERGE/Phenotype/DataDictionaryValidator.html">EMERGE::Phenotype::DataDictionaryValidator</a>
+
+          <li><a href="../../EMERGE/Phenotype/DataFileValidator.html">EMERGE::Phenotype::DataFileValidator</a>
+
+          <li><a href="../../EMERGE/Phenotype/FileProcessor.html">EMERGE::Phenotype::FileProcessor</a>
+
+          <li><a href="../../Api.html">Api</a>
+
+          <li><a href="../../Api/V1.html">Api::V1</a>
+
+          <li><a href="../../Api/V1/ApiController.html">Api::V1::ApiController</a>
+
+          <li><a href="../../Api/V1/SubmissionsController.html">Api::V1::SubmissionsController</a>
+
+          <li><a href="../../ApplicationController.html">ApplicationController</a>
+
+          <li><a href="../../ApplicationHelper.html">ApplicationHelper</a>
+
+          <li><a href="../../Submission.html">Submission</a>
+
+          <li><a href="../../SubmissionsController.html">SubmissionsController</a>
+
+          <li><a href="../../SubmissionsHelper.html">SubmissionsHelper</a>
+
+        </ul>
+      </nav>
+
+    </div>
+  </nav>
+
+  <div id="documentation">
+    <h1 class="class">class EMERGE::Phenotype::DataDictionaryValidator</h1>
+
+    <div id="description" class="description">
+
+      <p>Performs validation of a data dictionary file, according to the pre-defined
+        rules</p>
+      <dl class="rdoc-list note-list">
+        <dt>Author
+        <dd>
+          <p>Luke Rasmussen (<a href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a>)</p>
+        </dd>
       </dl>
-    </section>
-    
 
-    
+    </div><!-- description -->
 
-    <!-- Methods -->
-    
-     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
-      <h3 class="section-header">Public Class Methods</h3>
 
-    
-      <div id="method-c-new" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">new</span><span
-            class="method-args">(data_dictionary_data, delimiter = :csv)</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 30</span>
+    <section id="5Buntitled-5D" class="documentation-section">
+
+
+
+
+
+      <!-- Constants -->
+      <section id="constants-list" class="section">
+        <h3 class="section-header">Constants</h3>
+        <dl>
+
+          <dt id="COLUMN_VALIDATION_REGEX">COLUMN_VALIDATION_REGEX
+
+          <dd class="description">
+
+
+          <dt id="EXPECTED_COLUMNS">EXPECTED_COLUMNS
+
+          <dd class="description">
+
+
+          <dt id="REQUIRED_DATA_COLUMNS">REQUIRED_DATA_COLUMNS
+
+          <dd class="description">
+
+
+        </dl>
+      </section>
+
+
+
+
+      <!-- Methods -->
+
+      <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+        <h3 class="section-header">Public Class Methods</h3>
+
+
+        <div id="method-c-new" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">new</span><span class="method-args">(data_dictionary_data, delimiter =
+              :csv)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="new-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 30</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">data_dictionary_data</span>, <span class="ruby-identifier">delimiter</span> = <span class="ruby-value">:csv</span>)
   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">data_dictionary_data</span>, <span class="ruby-value">:data_dictionary</span>, <span class="ruby-identifier">delimiter</span>)
   <span class="ruby-ivar">@variables</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
   <span class="ruby-ivar">@values_column_valid</span> = <span class="ruby-keyword">false</span>
   <span class="ruby-comment">#@values = Hash.new</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- new-source -->
-          
-        </div>
+            </div><!-- new-source -->
 
-        
+          </div>
 
-        
-      </div><!-- new-method -->
 
-    
-    </section><!-- public-class-method-details -->
-  
-     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
-      <h3 class="section-header">Public Instance Methods</h3>
 
-    
-      <div id="method-i-check_constraints_for_types" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">check_constraints_for_types</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
+        </div><!-- new-method -->
 
-          
-          <div class="method-source-code" id="check_constraints_for_types-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 128</span>
+
+      </section><!-- public-class-method-details -->
+
+      <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+        <h3 class="section-header">Public Instance Methods</h3>
+
+
+        <div id="method-i-check_constraints_for_types" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">check_constraints_for_types</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="check_constraints_for_types-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 128</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">check_constraints_for_types</span>
   <span class="ruby-identifier">type_index</span> = <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">index</span>(<span class="ruby-string">&quot;TYPE&quot;</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">type_index</span>.<span class="ruby-identifier">nil?</span>
@@ -276,33 +278,32 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
     <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;'#{row[0]}' (#{(index + 1).ordinalize} row) is missing a maximum value - this is required for variables of type '#{row[type_index]}'&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">max_index</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">or</span> <span class="ruby-operator">!</span><span class="ruby-identifier">row</span>[<span class="ruby-identifier">max_index</span>].<span class="ruby-identifier">blank?</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- check_constraints_for_types-source -->
-          
-        </div>
+            </div><!-- check_constraints_for_types-source -->
 
-        
+          </div>
 
-        
-      </div><!-- check_constraints_for_types-method -->
 
-    
-      <div id="method-i-check_header_columns" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">check_header_columns</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="check_header_columns-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 75</span>
+        </div><!-- check_constraints_for_types-method -->
+
+
+        <div id="method-i-check_header_columns" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">check_header_columns</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="check_header_columns-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 75</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">check_header_columns</span>
   <span class="ruby-comment"># Compare against the standard set of headers that we expect</span>
   <span class="ruby-constant">EXPECTED_COLUMNS</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">header</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
@@ -317,33 +318,32 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
     <span class="ruby-ivar">@results</span>[<span class="ruby-value">:warnings</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The #{(index + 1).ordinalize} column, #{header}, is not a standard column in data dictionaries&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">found_index</span>.<span class="ruby-identifier">nil?</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- check_header_columns-source -->
-          
-        </div>
+            </div><!-- check_header_columns-source -->
 
-        
+          </div>
 
-        
-      </div><!-- check_header_columns-method -->
 
-    
-      <div id="method-i-check_required_columns" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">check_required_columns</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="check_required_columns-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 67</span>
+        </div><!-- check_header_columns-method -->
+
+
+        <div id="method-i-check_required_columns" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">check_required_columns</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="check_required_columns-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 67</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">check_required_columns</span>
   <span class="ruby-constant">REQUIRED_DATA_COLUMNS</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">header</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
     <span class="ruby-identifier">found_index</span> = <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">header</span>)
@@ -351,33 +351,32 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
     <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The #{header} column is missing and is required&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">found_index</span>.<span class="ruby-identifier">nil?</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- check_required_columns-source -->
-          
-        </div>
+            </div><!-- check_required_columns-source -->
 
-        
+          </div>
 
-        
-      </div><!-- check_required_columns-method -->
 
-    
-      <div id="method-i-check_unique_variables" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">check_unique_variables</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="check_unique_variables-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 102</span>
+        </div><!-- check_required_columns-method -->
+
+
+        <div id="method-i-check_unique_variables" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">check_unique_variables</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="check_unique_variables-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 102</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">check_unique_variables</span>
   <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">data</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
     <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_blank_row?</span>(<span class="ruby-identifier">row</span>)
@@ -388,33 +387,32 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- check_unique_variables-source -->
-          
-        </div>
+            </div><!-- check_unique_variables-source -->
 
-        
+          </div>
 
-        
-      </div><!-- check_unique_variables-method -->
 
-    
-      <div id="method-i-check_values" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">check_values</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="check_values-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 142</span>
+        </div><!-- check_unique_variables-method -->
+
+
+        <div id="method-i-check_values" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">check_values</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="check_values-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 142</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">check_values</span>
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@values_column_valid</span>
   <span class="ruby-identifier">values_column_index</span> = <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">index</span>(<span class="ruby-string">&quot;VALUES&quot;</span>)
@@ -456,33 +454,32 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- check_values-source -->
-          
-        </div>
+            </div><!-- check_values-source -->
 
-        
+          </div>
 
-        
-      </div><!-- check_values-method -->
 
-    
-      <div id="method-i-check_values_column_position" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">check_values_column_position</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="check_values_column_position-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 113</span>
+        </div><!-- check_values-method -->
+
+
+        <div id="method-i-check_values_column_position" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">check_values_column_position</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="check_values_column_position-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 113</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">check_values_column_position</span>
   <span class="ruby-comment"># If the VALUES column is present (it isn't required), it must be the last non-blank column.  This is because the way data ditionaries</span>
   <span class="ruby-comment"># are created &amp; exported to CSV by Excel, we'll see columns like &quot;VALUES,,,,,&quot;</span>
@@ -497,33 +494,32 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- check_values_column_position-source -->
-          
-        </div>
+            </div><!-- check_values_column_position-source -->
 
-        
+          </div>
 
-        
-      </div><!-- check_values_column_position-method -->
 
-    
-      <div id="method-i-set_variable_constraints" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">set_variable_constraints</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="set_variable_constraints-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 184</span>
+        </div><!-- check_values_column_position-method -->
+
+
+        <div id="method-i-set_variable_constraints" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">set_variable_constraints</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="set_variable_constraints-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 184</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">set_variable_constraints</span>
   <span class="ruby-identifier">type_index</span> = <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">index</span>(<span class="ruby-string">&quot;TYPE&quot;</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">type_index</span>.<span class="ruby-identifier">nil?</span>
@@ -538,33 +534,32 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
     <span class="ruby-ivar">@variables</span>[<span class="ruby-identifier">variable_key</span>][<span class="ruby-value">:max_value</span>] = <span class="ruby-identifier">max_index</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">convert_string_to_number</span>(<span class="ruby-identifier">row</span>[<span class="ruby-identifier">max_index</span>], <span class="ruby-identifier">normalized_type</span>)
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- set_variable_constraints-source -->
-          
-        </div>
+            </div><!-- set_variable_constraints-source -->
 
-        
+          </div>
 
-        
-      </div><!-- set_variable_constraints-method -->
 
-    
-      <div id="method-i-validate" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">validate</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="validate-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 37</span>
+        </div><!-- set_variable_constraints-method -->
+
+
+        <div id="method-i-validate" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">validate</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="validate-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 37</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>
   <span class="ruby-comment"># Start by performing checks that would prevent us from doing any additional processing.</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@results</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">rows_exist?</span>
@@ -584,33 +579,32 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
   <span class="ruby-identifier">set_variable_constraints</span>
   <span class="ruby-ivar">@results</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- validate-source -->
-          
-        </div>
+            </div><!-- validate-source -->
 
-        
+          </div>
 
-        
-      </div><!-- validate-method -->
 
-    
-      <div id="method-i-validate_rows" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">validate_rows</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="validate_rows-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 90</span>
+        </div><!-- validate-method -->
+
+
+        <div id="method-i-validate_rows" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">validate_rows</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="validate_rows-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 90</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate_rows</span>
   <span class="ruby-constant">EXPECTED_COLUMNS</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">header</span>, <span class="ruby-identifier">col_index</span><span class="ruby-operator">|</span>
     <span class="ruby-identifier">found_index</span> = <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">header</span>)
@@ -622,88 +616,85 @@ href="mailto:luke.rasmussen@northwestern.edu">luke.rasmussen@northwestern.edu</a
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- validate_rows-source -->
-          
-        </div>
+            </div><!-- validate_rows-source -->
 
-        
+          </div>
 
-        
-      </div><!-- validate_rows-method -->
 
-    
-      <div id="method-i-variable_name_column_exists-3F" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">variable_name_column_exists?</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="variable_name_column_exists-3F-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 61</span>
+        </div><!-- validate_rows-method -->
+
+
+        <div id="method-i-variable_name_column_exists-3F" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">variable_name_column_exists?</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="variable_name_column_exists-3F-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 61</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">variable_name_column_exists?</span>
   <span class="ruby-identifier">result</span> = <span class="ruby-ivar">@file</span>.<span class="ruby-identifier">headers</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-constant">EXPECTED_COLUMNS</span>[<span class="ruby-value">0</span>])
   <span class="ruby-ivar">@results</span>[<span class="ruby-value">:errors</span>].<span class="ruby-identifier">push</span>(<span class="ruby-node">&quot;The #{EXPECTED_COLUMNS[0]} column is missing and is required&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">result</span>
   <span class="ruby-identifier">result</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- variable_name_column_exists-3F-source -->
-          
-        </div>
+            </div><!-- variable_name_column_exists-3F-source -->
 
-        
+          </div>
 
-        
-      </div><!-- variable_name_column_exists-3F-method -->
 
-    
-      <div id="method-i-variables" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">variables</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
 
-        <div class="method-description">
-          
-          
-          
 
-          
-          <div class="method-source-code" id="variables-source">
-            <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 57</span>
+        </div><!-- variable_name_column_exists-3F-method -->
+
+
+        <div id="method-i-variables" class="method-detail ">
+
+          <div class="method-heading">
+            <span class="method-name">variables</span><span class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+
+
+          <div class="method-description">
+
+
+
+
+
+            <div class="method-source-code" id="variables-source">
+              <pre><span class="ruby-comment"># File lib/validation/data_dictionary_validator.rb, line 57</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">variables</span>
   <span class="ruby-ivar">@variables</span>
 <span class="ruby-keyword">end</span></pre>
-          </div><!-- variables-source -->
-          
-        </div>
+            </div><!-- variables-source -->
 
-        
-
-        
-      </div><!-- variables-method -->
-
-    
-    </section><!-- public-instance-method-details -->
-  
-  </section><!-- 5Buntitled-5D -->
-
-</div><!-- documentation -->
+          </div>
 
 
-<footer id="validator-badges">
-  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
-  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.2.
-  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
-</footer>
 
+
+        </div><!-- variables-method -->
+
+
+      </section><!-- public-instance-method-details -->
+
+    </section><!-- 5Buntitled-5D -->
+
+  </div><!-- documentation -->
+
+
+  <footer id="validator-badges">
+    <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+    <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.2.
+    <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+  </footer>
